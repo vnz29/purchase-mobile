@@ -8,14 +8,14 @@ const TabLayout = () => {
     <>
       <Tabs
         screenOptions={{
-          headerStyle: {
-            backgroundColor: "#34d399",
-          },
+          // headerStyle: {
+          //   backgroundColor: "#34d399",
+          // },
           headerLeft: () => (
             <Text
               style={{
                 fontSize: 20,
-                color: "#fff",
+                color: "#34d399",
                 fontWeight: 600,
                 letterSpacing: 0.5,
               }}
@@ -23,12 +23,12 @@ const TabLayout = () => {
               Spendly
             </Text>
           ),
-          headerRight: () => <Ionicons name="menu" size={28} color="white" />,
+          headerRight: () => <Ionicons name="menu" size={28} color="#34d399" />,
           headerRightContainerStyle: {
-            paddingRight: 10, // ✅ add right padding
+            paddingRight: 15, // ✅ add right padding
           },
           headerLeftContainerStyle: {
-            paddingLeft: 10, // ✅ add right padding
+            paddingLeft: 15, // ✅ add right padding
           },
         }}
       >
