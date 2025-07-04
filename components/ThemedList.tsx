@@ -86,7 +86,9 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-    padding: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    gap: 6,
   },
   name: {
     fontSize: 16,
