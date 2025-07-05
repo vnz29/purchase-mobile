@@ -6,15 +6,23 @@ import ThemedTextInput from "./ThemedTextInput";
 import ThemedText from "./ThemedText";
 import ThemedButton from "./ThemedButton";
 export type Ref = BottomSheetModal;
+type PurchasedItem = {
+  id: string;
+  name: string;
+  price: string;
+  image: string;
+  date: string;
+};
 
 type Props = {
   snapPoints: string[];
   onChange?: (index: number) => void;
   onClosePress: () => void;
+  item?: PurchasedItem | null; // Add
 };
 
 const CustomBottomSheet = forwardRef<Ref, Props>(
-  ({ snapPoints, onChange, onClosePress }, ref) => {
+  ({ snapPoints, onChange, onClosePress, item }, ref) => {
     return (
       <BottomSheetModal
         ref={ref}
@@ -40,7 +48,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>(
               <ThemedTextInput
                 style={styles.input}
                 placeholder="Username"
-                // value={value}
+                value={item?.name}
                 // onChangeText={(text) => setValue(text)}
               />
             </View>
@@ -48,7 +56,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>(
               <ThemedTextInput
                 style={styles.input}
                 placeholder="Username"
-                // value={value}
+                value={item?.price}
                 // onChangeText={(text) => setValue(text)}
               />
             </View>

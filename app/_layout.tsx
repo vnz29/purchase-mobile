@@ -10,6 +10,8 @@ import { router, Slot, Stack } from "expo-router";
 import { Colors } from "../constant/Colors";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 const RootLayout = () => {
   const [ready, setReady] = useState(false);
@@ -41,8 +43,23 @@ const RootLayout = () => {
         <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       </Stack> */}
-
-      <Slot initialRouteName={isAuthenticated ? "(tabs)" : "(auth)"} />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <BottomSheetModalProvider>
+          <Stack
+            initialRouteName={isAuthenticated ? "(tabs)" : "(auth)"}
+            screenOptions={{ headerShown: false }}
+          >
+            <Stack.Screen
+              name="recentpurchase"
+              options={{
+                headerShown: true,
+                title: "Purchases",
+                headerTitleAlign: "center",
+              }}
+            />
+          </Stack>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
       {/* <Stack>
         <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />

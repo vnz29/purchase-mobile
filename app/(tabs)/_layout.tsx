@@ -24,83 +24,78 @@ const TabLayout = () => {
     }
   };
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <BottomSheetModalProvider>
-        <Tabs
-          screenOptions={{
-            // headerStyle: {
-            //   backgroundColor: "#34d399",
-            // },
-            tabBarActiveTintColor: "#34d399",
+    <Tabs
+      screenOptions={{
+        // headerStyle: {
+        //   backgroundColor: "#34d399",
+        // },
+        tabBarActiveTintColor: "#34d399",
+        freezeOnBlur: true,
+        headerLeft: () => (
+          <Text
+            style={{
+              fontSize: 20,
+              color: "#34d399",
+              fontWeight: 600,
+              letterSpacing: 0.5,
+            }}
+          >
+            Spendly
+          </Text>
+        ),
+        headerRight: () => <Ionicons name="menu" size={28} color="#34d399" />,
+        headerRightContainerStyle: {
+          paddingRight: 15, // ✅ add right padding
+        },
+        headerLeftContainerStyle: {
+          paddingLeft: 15, // ✅ add right padding
+        },
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
 
-            headerLeft: () => (
-              <Text
-                style={{
-                  fontSize: 20,
-                  color: "#34d399",
-                  fontWeight: 600,
-                  letterSpacing: 0.5,
-                }}
-              >
-                Spendly
-              </Text>
-            ),
-            headerRight: () => (
-              <Ionicons name="menu" size={28} color="#34d399" />
-            ),
-            headerRightContainerStyle: {
-              paddingRight: 15, // ✅ add right padding
-            },
-            headerLeftContainerStyle: {
-              paddingLeft: 15, // ✅ add right padding
-            },
-          }}
-        >
-          <Tabs.Screen
-            name="index"
-            options={{
-              title: "Home",
-              headerTitle: "",
-              tabBarIcon: ({ focused }) => (
-                <Octicons
-                  name="person"
-                  size={24}
-                  color={focused ? "#34d399" : "gray"}
-                />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="history"
-            options={{
-              title: "Purchase History",
-              headerTitle: "",
-              tabBarIcon: ({ focused }) => (
-                <FontAwesome5
-                  name="money-check"
-                  size={24}
-                  color={focused ? "#34d399" : "gray"}
-                />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="about"
-            options={{
-              title: "About",
-              headerTitle: "",
-              tabBarIcon: ({ focused }) => (
-                <FontAwesome6
-                  name="circle-question"
-                  size={24}
-                  color={focused ? "#34d399" : "gray"}
-                />
-              ),
-            }}
-          />
-        </Tabs>
-      </BottomSheetModalProvider>
-    </GestureHandlerRootView>
+          headerTitle: "",
+          tabBarIcon: ({ focused }) => (
+            <Octicons
+              name="person"
+              size={24}
+              color={focused ? "#34d399" : "gray"}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          title: "Purchase History",
+          headerTitle: "",
+          tabBarIcon: ({ focused }) => (
+            <FontAwesome5
+              name="money-check"
+              size={24}
+              color={focused ? "#34d399" : "gray"}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="about"
+        options={{
+          title: "About",
+          headerTitle: "",
+          tabBarIcon: ({ focused }) => (
+            <FontAwesome6
+              name="circle-question"
+              size={24}
+              color={focused ? "#34d399" : "gray"}
+            />
+          ),
+        }}
+      />
+    </Tabs>
   );
 };
 

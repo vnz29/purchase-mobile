@@ -8,7 +8,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import ThemedCard from "../../components/ThemedCard";
 import { MaterialIcons } from "@expo/vector-icons";
 import { SwipeListView } from "react-native-swipe-list-view";
@@ -23,7 +29,7 @@ import BottomSheet, {
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CustomBottomSheet, { Ref } from "../../components/CustomBottomSheet";
 import ThemedFlatlist from "../../components/ThemedFlatlist";
-import { Link } from "expo-router";
+import { Link, useFocusEffect } from "expo-router";
 type PurchasedItem = {
   id: string;
   name: string;
@@ -98,18 +104,26 @@ const Index = () => {
   const snapPoints = useMemo(() => ["45%"], []);
 
   const handlePresentModalPress = useCallback(() => {
-    console.log("hello");
+    console.log("handlePresentModalPress index");
     bottomSheetModalRef.current?.present();
   }, []);
 
   const handleCloseModalPress = useCallback(() => {
     bottomSheetModalRef.current?.dismiss();
-    console.log("hello1");
+    console.log("handleCloseModalPress index");
   }, []);
 
   const handleSheetChanges = useCallback((index: number) => {
     console.log("Sheet changed to index:", index);
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        bottomSheetModalRef.current?.dismiss();
+      };
+    }, [])
+  );
 
   const renderItem = (item: (typeof items)[0]) => (
     <View style={styles.itemContainer}>
@@ -124,6 +138,9 @@ const Index = () => {
       </View>
     </View>
   );
+  useEffect(() => {
+    console.log("test1");
+  });
   return (
     <ThemedHomeView style={styles.container}>
       <ScrollView style={{ paddingHorizontal: 20 }}>
@@ -154,20 +171,24 @@ const Index = () => {
         </ThemedCard>
         <View
           style={{
-            backgroundColor: "red",
+            backgroundColor: "#fff",
             marginVertical: 10,
             paddingVertical: 10,
+            borderRadius: 10,
           }}
         >
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
-              paddingHorizontal: 10,
+              paddingHorizontal: 15,
+              paddingVertical: 5,
             }}
           >
-            <Text>Product Purchased:</Text>
-            <Link href="/recent-purchase">See all</Link>
+            <Text style={{ fontSize: 16, fontWeight: 700 }}>
+              Product Purchased:
+            </Text>
+            <Link href="/recentpurchase">See all</Link>
           </View>
           <ThemedFlatlist items={items} renderComponent={renderItem} />
           {/* <ThemedList
@@ -246,8 +267,8 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   name: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 14,
+    fontWeight: 500,
   },
   price: {
     marginTop: 4,
