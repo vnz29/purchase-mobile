@@ -62,6 +62,7 @@ const ThemedList = ({ items, handleDelete, handleEdit }: ThemeListProps) => {
       disableRightSwipe
       contentContainerStyle={styles.list}
       scrollEnabled={false}
+      style={{ borderRadius: 8, marginBottom: 10 }}
     />
   );
 };
@@ -75,8 +76,8 @@ const styles = StyleSheet.create({
   itemContainer: {
     backgroundColor: "#fff",
     flexDirection: "row",
-    marginBottom: 10,
-    borderRadius: 8,
+    // marginBottom: 10,
+    // borderRadius: 8,
     overflow: "hidden",
     elevation: 2,
   },

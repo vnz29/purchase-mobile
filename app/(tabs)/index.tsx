@@ -22,6 +22,8 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CustomBottomSheet, { Ref } from "../../components/CustomBottomSheet";
+import ThemedFlatlist from "../../components/ThemedFlatlist";
+import { Link } from "expo-router";
 type PurchasedItem = {
   id: string;
   name: string;
@@ -109,6 +111,19 @@ const Index = () => {
     console.log("Sheet changed to index:", index);
   }, []);
 
+  const renderItem = (item: (typeof items)[0]) => (
+    <View style={styles.itemContainer}>
+      <View style={styles.textContainer}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.price}>{item.price}</Text>
+        </View>
+        <View>
+          <Text style={styles.date}>Purchased on {item.date}</Text>
+        </View>
+      </View>
+    </View>
+  );
   return (
     <ThemedHomeView style={styles.container}>
       <ScrollView style={{ paddingHorizontal: 20 }}>
@@ -137,15 +152,29 @@ const Index = () => {
             </View>
           </View>
         </ThemedCard>
-        <View>
-          <Text style={{ paddingVertical: 10, fontSize: 16, fontWeight: 600 }}>
-            Product Purchased:
-          </Text>
-          <ThemedList
+        <View
+          style={{
+            backgroundColor: "red",
+            marginVertical: 10,
+            paddingVertical: 10,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingHorizontal: 10,
+            }}
+          >
+            <Text>Product Purchased:</Text>
+            <Link href="/recent-purchase">See all</Link>
+          </View>
+          <ThemedFlatlist items={items} renderComponent={renderItem} />
+          {/* <ThemedList
             items={items}
             handleDelete={(id) => handleDelete(id)}
             handleEdit={(id) => handleEdit(id)}
-          />
+          /> */}
         </View>
       </ScrollView>
       <TouchableOpacity
@@ -192,5 +221,65 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 36,
     alignItems: "center",
+  },
+  // design for flatlist
+
+  list: {
+    // padding: 16,
+  },
+  itemContainer: {
+    backgroundColor: "#fff",
+    flexDirection: "row",
+    // marginBottom: 10,
+    // borderRadius: 8,
+    overflow: "hidden",
+    elevation: 2,
+  },
+  image: {
+    width: 80,
+    height: 80,
+  },
+  textContainer: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    gap: 6,
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  price: {
+    marginTop: 4,
+    fontSize: 14,
+    color: "green",
+  },
+  date: {
+    marginTop: 4,
+    fontSize: 12,
+    color: "#666",
+  },
+  rowBack: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingRight: 10,
+    marginBottom: 40,
+    borderRadius: 8,
+  },
+  actionButton: {
+    width: 40,
+    height: 40,
+    marginLeft: 5,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  editBtn: {
+    backgroundColor: "#007bff",
+  },
+  deleteBtn: {
+    backgroundColor: "#dc3545",
   },
 });
