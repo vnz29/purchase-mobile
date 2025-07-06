@@ -12,10 +12,12 @@ import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+const queryClient = new QueryClient();
 
 const RootLayout = () => {
   const [ready, setReady] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const colorScheme = useColorScheme();
   console.log(colorScheme);
   const theme = Colors[colorScheme === "dark" ? "dark" : "light"];
@@ -45,19 +47,21 @@ const RootLayout = () => {
       </Stack> */}
       <GestureHandlerRootView style={{ flex: 1 }}>
         <BottomSheetModalProvider>
-          <Stack
-            initialRouteName={isAuthenticated ? "(tabs)" : "(auth)"}
-            screenOptions={{ headerShown: false }}
-          >
-            <Stack.Screen
-              name="recentpurchase"
-              options={{
-                headerShown: true,
-                title: "Purchases",
-                headerTitleAlign: "center",
-              }}
-            />
-          </Stack>
+          <QueryClientProvider client={queryClient}>
+            <Stack
+              initialRouteName={isAuthenticated ? "(tabs)" : "(auth)"}
+              screenOptions={{ headerShown: false }}
+            >
+              <Stack.Screen
+                name="recentpurchase"
+                options={{
+                  headerShown: true,
+                  title: "Purchases",
+                  headerTitleAlign: "center",
+                }}
+              />
+            </Stack>
+          </QueryClientProvider>
         </BottomSheetModalProvider>
       </GestureHandlerRootView>
       {/* <Stack>

@@ -3,7 +3,7 @@ import axios from "axios";
 import { useAuthStore } from "../store/useAuthStore";
 
 const api = axios.create({
-  baseURL: "http://<YOUR-IP>:5000/api",
+  baseURL: "http://192.168.100.163:3000/api",
   withCredentials: true,
 });
 
@@ -23,7 +23,12 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/user/login")
+    ) {
+      console.log("test");
       originalRequest._retry = true;
 
       if (isRefreshing) {
@@ -38,7 +43,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const res = await api.get("/auth/refresh");
+        const res = await api.get("/user/refreshToken");
         const newToken = res.data.accessToken;
         api.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
         processQueue(null, newToken);
