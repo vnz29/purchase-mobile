@@ -30,12 +30,20 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CustomBottomSheet, { Ref } from "../../components/CustomBottomSheet";
 import ThemedFlatlist from "../../components/ThemedFlatlist";
 import { Link, useFocusEffect } from "expo-router";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import api from "../../lib/axios";
+import { useAuthStore } from "../../store/useAuthStore";
 type PurchasedItem = {
   id: string;
   name: string;
   price: string;
   image: string;
   date: string;
+};
+
+type FormData = {
+  name: string;
+  amount: string; // use string for input fields, even if number later
 };
 
 const Index = () => {
@@ -90,13 +98,13 @@ const Index = () => {
       date: "June 20, 2025",
     },
   ]);
-  const handleDelete = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  };
+  // const handleDelete = (id: string) => {
+  //   setItems((prev) => prev.filter((item) => item.id !== id));
+  // };
 
-  const handleEdit = (item: PurchasedItem) => {
-    Alert.alert("Edit Item", `Editing ${item.name}`);
-  };
+  // const handleEdit = (item: PurchasedItem) => {
+  //   Alert.alert("Edit Item", `Editing ${item.name}`);
+  // };
   // code for bottom sheet
 
   const bottomSheetModalRef = useRef<Ref>(null);
@@ -124,7 +132,66 @@ const Index = () => {
       };
     }, [])
   );
+  const [form, setForm] = useState<FormData>({
+    name: "",
+    amount: "",
+  });
 
+  const { user } = useAuthStore();
+  console.log(user?.accessToken + "line 133");
+
+  const handleChange = (key: keyof FormData, value: string) => {
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const name = form.name;
+      const amount = parseFloat(form.amount);
+      console.log(user?.id);
+      const res = await api.post("/purchase/addPurchase", {
+        name,
+        amount,
+        userID: user?.id,
+      });
+      console.log(res);
+      api.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${user?.accessToken}`;
+      return res.data;
+    },
+    onSuccess: (data) => {
+      Alert.alert("Product successfully added");
+      console.log(data);
+    },
+    onError: (error: any) => {
+      console.log("Response:", error?.response?.data);
+
+      Alert.alert(
+        "Login failed",
+        error.response?.data?.message || "Something went wrong"
+      );
+    },
+  });
+
+  const { data } = useQuery({
+    queryKey: ["purchase"],
+    queryFn: async () => {
+      try {
+        const res = await api.get(`/purchase?userID=${user?.id}`);
+        api.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${user?.accessToken}`;
+        return res.data;
+      } catch (error) {
+        console.error("Error in createTodo:", error);
+        throw error;
+      }
+    },
+  });
   const renderItem = (item: (typeof items)[0]) => (
     <View style={styles.itemContainer}>
       <View style={styles.textContainer}>
@@ -138,9 +205,7 @@ const Index = () => {
       </View>
     </View>
   );
-  useEffect(() => {
-    console.log("test1");
-  });
+  console.log(data);
   return (
     <ThemedHomeView style={styles.container}>
       <ScrollView style={{ paddingHorizontal: 20 }}>
@@ -210,6 +275,10 @@ const Index = () => {
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onClosePress={handleCloseModalPress}
+        inputChange={handleChange}
+        form={form}
+        isLoading={mutation.isPending}
+        onSubmit={() => mutation.mutate()}
       />
     </ThemedHomeView>
   );

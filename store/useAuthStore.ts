@@ -1,7 +1,12 @@
 // app/store/useAuthStore.ts
 import { create } from "zustand";
 
-type User = { id: string; email: string };
+type User = {
+  accessToken?: string;
+  username?: string;
+  message?: string;
+  id: string;
+};
 
 type AuthStore = {
   user: User | null;
@@ -14,7 +19,7 @@ type AuthStore = {
 export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
   isLoading: true,
-  setUser: (user) => set({ user }),
+  setUser: (user) => set({ user: user }),
   setIsLoading: (loading) => set({ isLoading: loading }),
   logout: () => set({ user: null }),
 }));

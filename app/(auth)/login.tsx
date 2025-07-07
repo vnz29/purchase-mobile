@@ -27,17 +27,18 @@ const login = () => {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      console.log("napasok");
-      console.log(api);
       const res = await api.post("/user/login", { username, password });
+
       api.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${res.data.accessToken}`;
+
       return res.data;
     },
     onSuccess: (data) => {
+      console.log("hello");
       console.log(data);
-      setUser(data.user);
+      setUser(data);
       router.replace("/");
     },
     onError: (error: any) => {

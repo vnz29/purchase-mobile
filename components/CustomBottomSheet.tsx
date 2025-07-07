@@ -13,16 +13,35 @@ type PurchasedItem = {
   image: string;
   date: string;
 };
+type FormData = {
+  name: string;
+  amount: string; // use string for input fields, even if number later
+};
 
 type Props = {
   snapPoints: string[];
   onChange?: (index: number) => void;
   onClosePress: () => void;
   item?: PurchasedItem | null; // Add
+  inputChange: (key: keyof FormData, value: string) => void;
+  form: FormData;
+  isLoading: boolean;
+  onSubmit: () => void;
 };
 
 const CustomBottomSheet = forwardRef<Ref, Props>(
-  ({ snapPoints, onChange, onClosePress, item }, ref) => {
+  (
+    {
+      snapPoints,
+      onChange,
+      onClosePress,
+      form,
+      inputChange,
+      isLoading,
+      onSubmit,
+    },
+    ref
+  ) => {
     return (
       <BottomSheetModal
         ref={ref}
@@ -47,22 +66,25 @@ const CustomBottomSheet = forwardRef<Ref, Props>(
             <View>
               <ThemedTextInput
                 style={styles.input}
-                placeholder="Username"
-                value={item?.name}
-                // onChangeText={(text) => setValue(text)}
+                placeholder="Name"
+                value={form?.name}
+                onChangeText={(text) => inputChange("name", text)}
               />
             </View>
             <View>
               <ThemedTextInput
                 style={styles.input}
-                placeholder="Username"
-                value={item?.price}
-                // onChangeText={(text) => setValue(text)}
+                placeholder="Amount"
+                value={form?.amount}
+                onChangeText={(text) => inputChange("amount", text)}
+                keyboardType="numeric"
               />
             </View>
             <View style={[styles.itemCenter, { marginTop: 20 }]}>
-              <ThemedButton style={styles.loginButton}>
-                <ThemedText style={styles.fabText}>Add</ThemedText>
+              <ThemedButton style={styles.loginButton} onPress={onSubmit}>
+                <ThemedText style={styles.fabText}>
+                  {isLoading ? "Loading" : "Add"}
+                </ThemedText>
               </ThemedButton>
             </View>
           </View>
