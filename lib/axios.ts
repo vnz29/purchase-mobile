@@ -4,7 +4,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import * as SecureStore from "expo-secure-store";
 
 const api = axios.create({
-  baseURL: "http://192.168.100.163:3000/api", // Change this to your IP
+  baseURL: "http://192.168.100.78:3000/api", // Change this to your IP
 });
 
 let isRefreshing = false;

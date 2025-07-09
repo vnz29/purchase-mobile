@@ -35,13 +35,12 @@ const RootLayout = () => {
         const refreshToken = await SecureStore.getItemAsync("refreshToken");
 
         if (!refreshToken) {
-          console.log("No refresh token found");
           setIsAuthenticated(false);
           return;
         }
 
         const response = await fetch(
-          "http://192.168.100.163:3000/api/user/refreshToken",
+          "http://192.168.100.78:3000/api/user/refreshToken",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -59,9 +58,7 @@ const RootLayout = () => {
         // const { accessToken, refreshToken: newRefreshToken } =
         //   await response.json();
         const { accessToken, userId, username } = await response.json();
-        console.log(userId, username);
-        console.log(accessToken, "layout accesstoken");
-        console.log(refreshToken, "layout refreshtoken");
+
         // Save new tokens to Zustand + SecureStore
         //await SecureStore.setItemAsync("refreshToken", newRefreshToken);
         useAuthStore.getState().setTokens(accessToken, refreshToken);
@@ -95,7 +92,14 @@ const RootLayout = () => {
             initialRouteName={isAuthenticated ? "(tabs)" : "(auth)"}
             screenOptions={{ headerShown: false }}
           >
-            {/* Add any additional screens here if needed */}
+            <Stack.Screen
+              name="recentpurchase"
+              options={{
+                headerShown: true,
+                title: "Purchases",
+                headerTitleAlign: "center",
+              }}
+            />
           </Stack>
         </QueryClientProvider>
       </BottomSheetModalProvider>

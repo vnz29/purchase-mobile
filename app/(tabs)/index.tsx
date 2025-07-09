@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Alert,
   Button,
   ListRenderItemInfo,
@@ -30,7 +31,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CustomBottomSheet, { Ref } from "../../components/CustomBottomSheet";
 import ThemedFlatlist from "../../components/ThemedFlatlist";
 import { Link, useFocusEffect } from "expo-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../lib/axios";
 import { useAuthStore } from "../../store/useAuthStore";
 import * as SecureStore from "expo-secure-store";
@@ -42,6 +43,21 @@ type PurchasedItem = {
   date: string;
 };
 
+type ItemList = {
+  __v: number;
+  _id: string;
+  amount: number;
+  createdAt: string; // ISO date string
+  isDeleted: boolean;
+  name: string;
+  updatedAt: string; // ISO date string
+  userId: string;
+};
+
+type PurchaseResponseHttp = {
+  item: ItemList[];
+  message: string;
+};
 type FormData = {
   name: string;
   amount: string; // use string for input fields, even if number later
@@ -146,12 +162,12 @@ const Index = () => {
       [key]: value,
     }));
   };
-
+  const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async () => {
       const name = form.name;
       const amount = parseFloat(form.amount);
-      console.log(user?.id);
+
       const res = await api.post("/purchase/addPurchase", {
         name,
         amount,
@@ -162,8 +178,8 @@ const Index = () => {
       return res.data;
     },
     onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["purchase"] });
       Alert.alert("Product successfully added");
-      console.log(data);
     },
     onError: (error: any) => {
       console.log("Response:", error?.response?.data);
@@ -175,13 +191,13 @@ const Index = () => {
     },
   });
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery<PurchaseResponseHttp>({
     queryKey: ["purchase"],
     queryFn: async () => {
       try {
         const res = await api.get(`/purchase?userID=${user?.id}`);
         api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-        console.log(res.data);
+
         return res.data;
       } catch (error) {
         console.error("Error in createTodo:", error);
@@ -189,15 +205,21 @@ const Index = () => {
       }
     },
   });
-  const renderItem = (item: (typeof items)[0]) => (
+  console.log(data, "hello");
+  const renderItem = (item: ItemList) => (
     <View style={styles.itemContainer}>
       <View style={styles.textContainer}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.price}>{item.price}</Text>
+          <Text style={styles.price}>{item.amount}</Text>
         </View>
         <View>
-          <Text style={styles.date}>Purchased on {item.date}</Text>
+          <Text style={styles.date}>
+            Purchased on{" "}
+            {new Date(item.createdAt).toLocaleDateString("en-CA", {
+              timeZone: "Asia/Manila",
+            })}
+          </Text>
         </View>
       </View>
     </View>
@@ -233,7 +255,7 @@ const Index = () => {
                 Total spent today
               </Text>
               <Text style={{ color: "white", fontSize: 16, fontWeight: 600 }}>
-                PHP 123.45
+                {data?.item.reduce((sum: number, item) => sum + item.amount, 0)}
               </Text>
             </View>
           </View>
@@ -259,9 +281,25 @@ const Index = () => {
             </Text>
             <Link href="/recentpurchase">See all</Link>
           </View>
-          <ThemedFlatlist items={items} renderComponent={renderItem} />
+          {isLoading ? (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ActivityIndicator size="large" />
+            </View>
+          ) : (
+            <ThemedFlatlist
+              items={data?.item ?? []}
+              renderComponent={renderItem}
+            />
+          )}
+
           {/* <ThemedList
-            items={items}
+            items={items}r
             handleDelete={(id) => handleDelete(id)}
             handleEdit={(id) => handleEdit(id)}
           /> */}

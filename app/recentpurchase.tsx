@@ -196,13 +196,13 @@ const recentpurchase = () => {
           handleEdit={(id) => handleEdit(id)}
         />
       </View>
-      {/* <CustomBottomSheet
+      <CustomBottomSheet
         ref={bottomSheetModalRef}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onClosePress={handleCloseModalPress}
         item={selectedItem}
-      /> */}
+      />
     </ScrollView>
   );
 };
