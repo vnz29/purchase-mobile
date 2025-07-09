@@ -33,6 +33,7 @@ import { Link, useFocusEffect } from "expo-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import api from "../../lib/axios";
 import { useAuthStore } from "../../store/useAuthStore";
+import * as SecureStore from "expo-secure-store";
 type PurchasedItem = {
   id: string;
   name: string;
@@ -137,8 +138,7 @@ const Index = () => {
     amount: "",
   });
 
-  const { user } = useAuthStore();
-  console.log(user?.accessToken + "line 133");
+  const { user, accessToken } = useAuthStore();
 
   const handleChange = (key: keyof FormData, value: string) => {
     setForm((prev) => ({
@@ -157,10 +157,8 @@ const Index = () => {
         amount,
         userID: user?.id,
       });
-      console.log(res);
-      api.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${user?.accessToken}`;
+
+      api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
       return res.data;
     },
     onSuccess: (data) => {
@@ -182,9 +180,8 @@ const Index = () => {
     queryFn: async () => {
       try {
         const res = await api.get(`/purchase?userID=${user?.id}`);
-        api.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${user?.accessToken}`;
+        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+        console.log(res.data);
         return res.data;
       } catch (error) {
         console.error("Error in createTodo:", error);
@@ -205,13 +202,20 @@ const Index = () => {
       </View>
     </View>
   );
-  console.log(data);
+
   return (
     <ThemedHomeView style={styles.container}>
       <ScrollView style={{ paddingHorizontal: 20 }}>
         <View style={{ paddingVertical: 10 }}>
           <Text style={{ fontSize: 22, fontWeight: 600 }}>Dashboard</Text>
         </View>
+        <Button
+          title="Clear SecureStore"
+          onPress={async () => {
+            await SecureStore.deleteItemAsync("refreshToken");
+            alert("SecureStore cleared");
+          }}
+        />
         <ThemedCard
           style={{ paddingHorizontal: 20, paddingVertical: 20, height: 150 }}
         >

@@ -1,5 +1,6 @@
 // app/store/useAuthStore.ts
 import { create } from "zustand";
+import * as SecureStore from "expo-secure-store";
 
 type User = {
   accessToken?: string;
@@ -14,6 +15,9 @@ type AuthStore = {
   setUser: (user: User | null) => void;
   setIsLoading: (loading: boolean) => void;
   logout: () => void;
+  accessToken: string | null;
+  setTokens: (accessToken: string, refreshToken: string) => Promise<void>;
+  getRefreshToken: () => Promise<string | null>;
 };
 
 export const useAuthStore = create<AuthStore>((set) => ({
@@ -21,5 +25,20 @@ export const useAuthStore = create<AuthStore>((set) => ({
   isLoading: true,
   setUser: (user) => set({ user: user }),
   setIsLoading: (loading) => set({ isLoading: loading }),
-  logout: () => set({ user: null }),
+
+  accessToken: null,
+
+  setTokens: async (accessToken, refreshToken) => {
+    await SecureStore.setItemAsync("refreshToken", refreshToken);
+    set({ accessToken });
+  },
+
+  getRefreshToken: async () => {
+    return await SecureStore.getItemAsync("refreshToken");
+  },
+
+  logout: async () => {
+    await SecureStore.deleteItemAsync("refreshToken");
+    set({ accessToken: null });
+  },
 }));

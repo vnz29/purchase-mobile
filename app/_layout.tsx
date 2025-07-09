@@ -1,100 +1,106 @@
+// app/_layout.tsx
 import {
+  ActivityIndicator,
   Pressable,
   StyleSheet,
-  Text,
   useColorScheme,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { router, Slot, Stack } from "expo-router";
+import React, { use, useEffect, useState } from "react";
+import { Stack } from "expo-router";
 import { Colors } from "../constant/Colors";
-import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as SecureStore from "expo-secure-store";
+import { useAuthStore } from "../store/useAuthStore";
+import * as SplashScreen from "expo-splash-screen";
+
+// prevent auto-hiding the splash screen
+SplashScreen.preventAutoHideAsync();
+
 const queryClient = new QueryClient();
 
 const RootLayout = () => {
-  const [ready, setReady] = useState(false);
+  const [appReady, setAppReady] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   const colorScheme = useColorScheme();
-  console.log(colorScheme);
   const theme = Colors[colorScheme === "dark" ? "dark" : "light"];
 
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        const refreshToken = await SecureStore.getItemAsync("refreshToken");
+
+        if (!refreshToken) {
+          console.log("No refresh token found");
+          setIsAuthenticated(false);
+          return;
+        }
+
+        const response = await fetch(
+          "http://192.168.100.163:3000/api/user/refreshToken",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refreshToken }),
+          }
+        );
+
+        if (!response.ok) {
+          console.log("Refresh token invalid or expired");
+          await SecureStore.deleteItemAsync("refreshToken");
+          setIsAuthenticated(false);
+          return;
+        }
+
+        // const { accessToken, refreshToken: newRefreshToken } =
+        //   await response.json();
+        const { accessToken, userId, username } = await response.json();
+        console.log(userId, username);
+        console.log(accessToken, "layout accesstoken");
+        console.log(refreshToken, "layout refreshtoken");
+        // Save new tokens to Zustand + SecureStore
+        //await SecureStore.setItemAsync("refreshToken", newRefreshToken);
+        useAuthStore.getState().setTokens(accessToken, refreshToken);
+        useAuthStore.getState().setUser({ id: userId, username: username });
+        setIsAuthenticated(true);
+      } catch (err) {
+        console.error("Auth check failed", err);
+        setIsAuthenticated(false);
+      } finally {
+        setAppReady(true);
+        SplashScreen.hideAsync();
+      }
+    };
+
+    initAuth();
+  }, []);
+
+  if (!appReady) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
-    <>
-      {/* <StatusBar style="auto" />
-      <Stack
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: theme.navBackground,
-          },
-          headerRight: () => (
-            <Pressable
-              onPress={() => alert("Global Help button pressed")}
-              style={{ marginRight: 0 }}
-            >
-              <Ionicons name="help-circle-outline" size={20} color="white" />
-            </Pressable>
-          ),
-        }}
-      >
-
-        <Stack.Screen name="index" options={{ title: "" }} />
-        <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      </Stack> */}
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <BottomSheetModalProvider>
-          <QueryClientProvider client={queryClient}>
-            <Stack
-              initialRouteName={isAuthenticated ? "(tabs)" : "(auth)"}
-              screenOptions={{ headerShown: false }}
-            >
-              <Stack.Screen
-                name="recentpurchase"
-                options={{
-                  headerShown: true,
-                  title: "Purchases",
-                  headerTitleAlign: "center",
-                }}
-              />
-            </Stack>
-          </QueryClientProvider>
-        </BottomSheetModalProvider>
-      </GestureHandlerRootView>
-      {/* <Stack>
-        <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      </Stack> */}
-    </>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <BottomSheetModalProvider>
+        <QueryClientProvider client={queryClient}>
+          <Stack
+            initialRouteName={isAuthenticated ? "(tabs)" : "(auth)"}
+            screenOptions={{ headerShown: false }}
+          >
+            {/* Add any additional screens here if needed */}
+          </Stack>
+        </QueryClientProvider>
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
   );
-  // const [isReady, setIsReady] = useState(false);
-  // const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // useEffect(() => {
-  //   async function checkAuth() {
-  //     // Fake auth check delay
-  //     await new Promise((r) => setTimeout(r, 5000));
-
-  //     const userLoggedIn = false; // Replace with real auth logic
-  //     setIsAuthenticated(userLoggedIn);
-  //     setIsReady(true);
-  //     console.log(userLoggedIn);
-  //     if (!userLoggedIn) {
-  //       router.replace("/login");
-  //     }
-  //   }
-  //   checkAuth();
-  // }, []);
-
-  // if (!isReady) {
-  //   // Can show a splash screen or loader here
-  //   return null;
-  // }
-
-  // return <Slot />;
 };
 
 export default RootLayout;

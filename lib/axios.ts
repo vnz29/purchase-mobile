@@ -1,10 +1,10 @@
 // app/lib/axios.ts
 import axios from "axios";
 import { useAuthStore } from "../store/useAuthStore";
+import * as SecureStore from "expo-secure-store";
 
 const api = axios.create({
-  baseURL: "http://192.168.100.78:3000/api",
-  withCredentials: true,
+  baseURL: "http://192.168.100.163:3000/api", // Change this to your IP
 });
 
 let isRefreshing = false;
@@ -18,8 +18,17 @@ const processQueue = (error: any, token: string | null = null) => {
   failedQueue = [];
 };
 
+api.interceptors.request.use(
+  async (config) => {
+    const token = useAuthStore.getState().accessToken;
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 api.interceptors.response.use(
-  (res) => res,
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
@@ -28,14 +37,13 @@ api.interceptors.response.use(
       !originalRequest._retry &&
       !originalRequest.url.includes("/user/login")
     ) {
-      console.log("test");
       originalRequest._retry = true;
 
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         }).then((token) => {
-          originalRequest.headers["Authorization"] = `Bearer ${token}`;
+          originalRequest.headers.Authorization = `Bearer ${token}`;
           return api(originalRequest);
         });
       }
@@ -43,14 +51,29 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const res = await api.get("/user/refreshToken");
-        const newToken = res.data.accessToken;
-        api.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
-        processQueue(null, newToken);
+        const refreshToken = await SecureStore.getItemAsync("refreshToken");
+        if (!refreshToken) throw new Error("No refresh token found");
+
+        const res = await axios.post(
+          "http://192.168.100.163:3000/api/user/refreshToken",
+          {
+            refreshToken,
+          }
+        );
+
+        const newAccessToken = res.data.accessToken;
+        const newRefreshToken = res.data.refreshToken;
+
+        await useAuthStore
+          .getState()
+          .setTokens(newAccessToken, newRefreshToken);
+        processQueue(null, newAccessToken);
+
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        useAuthStore.getState().logout();
+        await useAuthStore.getState().logout();
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

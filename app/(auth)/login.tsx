@@ -18,12 +18,13 @@ import { Link, router } from "expo-router";
 import api from "../../lib/axios";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useMutation } from "@tanstack/react-query";
+import * as SecureStore from "expo-secure-store";
 
 const login = () => {
   const [value, setValue] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { setUser } = useAuthStore();
+  const { setUser, setTokens } = useAuthStore();
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -36,9 +37,9 @@ const login = () => {
       return res.data;
     },
     onSuccess: (data) => {
-      console.log("hello");
       console.log(data);
       setUser(data);
+      setTokens(data?.accessToken, data?.refreshToken);
       router.replace("/");
     },
     onError: (error: any) => {
