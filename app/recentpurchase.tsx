@@ -2,6 +2,9 @@ import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import ThemedList from "../components/ThemedList";
 import CustomBottomSheet, { Ref } from "../components/CustomBottomSheet";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "../lib/axios";
+import { useAuthStore } from "../store/useAuthStore";
 type PurchasedItem = {
   id: string;
   name: string;
@@ -10,158 +13,62 @@ type PurchasedItem = {
   date: string;
 };
 
+type ItemList = {
+  __v: number;
+  _id: string;
+  amount: number;
+  createdAt: string; // ISO date string
+  isDeleted: boolean;
+  name: string;
+  updatedAt: string; // ISO date string
+  userId: string;
+};
+
+type PurchaseResponseHttp = {
+  item: ItemList[];
+  message: string;
+};
+type FormData = {
+  id?: string;
+  name: string;
+  amount: string; // use string for input fields, even if number later
+};
+
 const recentpurchase = () => {
-  const [items, setItems] = useState<PurchasedItem[]>([
-    {
-      id: "1",
-      name: "Wireless Headphones",
-      price: "$99.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "2",
-      name: "Bluetooth Speaker",
-      price: "$49.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "3",
-      name: "Smart Watch",
-      price: "$129.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "4",
-      name: "Wireless Mouse",
-      price: "$19.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "5",
-      name: "Mechanical Keyboard",
-      price: "$89.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "6",
-      name: "USB-C Hub",
-      price: "$34.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "7",
-      name: "Webcam",
-      price: "$59.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "8",
-      name: "Portable SSD",
-      price: "$119.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "9",
-      name: "Noise Cancelling Earbuds",
-      price: "$149.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "10",
-      name: "Smartphone Stand",
-      price: "$14.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "11",
-      name: "Laptop Cooling Pad",
-      price: "$39.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "12",
-      name: "Gaming Chair",
-      price: "$199.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "13",
-      name: "Desk Lamp",
-      price: "$24.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "14",
-      name: "HDMI Cable",
-      price: "$9.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "15",
-      name: "Wireless Charger",
-      price: "$29.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "16",
-      name: "Smart LED Strip",
-      price: "$39.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "17",
-      name: "Fitness Tracker",
-      price: "$59.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "18",
-      name: "Tablet Stand",
-      price: "$19.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "19",
-      name: "Mini Projector",
-      price: "$149.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "20",
-      name: "VR Headset",
-      price: "$299.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-  ]);
-  const [selectedItem, setSelectedItem] = useState<PurchasedItem | null>(null);
+  const queryClient = useQueryClient();
+  const data = queryClient.getQueryData<PurchaseResponseHttp>(["purchase"]);
+  const [editRowMeta, setEditRowMeta] = useState<{
+    rowMap: any;
+    rowKey: string;
+  } | null>(null);
+  const { user, accessToken } = useAuthStore();
+  console.log(data);
+
+  const [form, setForm] = useState<FormData>({
+    name: "",
+    amount: "",
+  });
+  const handleChange = (key: keyof FormData, value: string) => {
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
   const handleDelete = (id: string) => {
     console.log("handleDelete");
-    setItems((prev) => prev.filter((item) => item.id !== id));
+    // setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleEdit = (item: PurchasedItem) => {
+  const handleEdit = (
+    item: ItemList,
+    rowMap: { [key: string]: { closeRow: () => void } },
+    rowKey: string
+  ) => {
     console.log("handleEdit");
-    setSelectedItem(item);
+    setForm({ id: item._id, name: item.name, amount: item.amount.toString() });
+    setEditRowMeta({ rowMap, rowKey });
+    // Auto-close swiped row
+
     handlePresentModalPress(item);
     // Alert.alert("Edit Item", `Editing ${item.name}`);
   };
@@ -170,7 +77,7 @@ const recentpurchase = () => {
 
   const snapPoints = useMemo(() => ["45%"], []);
 
-  const handlePresentModalPress = useCallback((item: PurchasedItem) => {
+  const handlePresentModalPress = useCallback((item: ItemList) => {
     console.log("handlePresentModalPress");
     bottomSheetModalRef.current?.present();
   }, []);
@@ -183,17 +90,69 @@ const recentpurchase = () => {
   const handleSheetChanges = useCallback((index: number) => {
     console.log("Sheet changed to index:", index);
   }, []);
-  console.log("test2");
+
+  const mutation = useMutation<PurchaseResponseHttp>({
+    mutationFn: async () => {
+      const name = form.name;
+      const amount = parseFloat(form.amount);
+      console.log(form.id);
+      const res = await api.put(`/purchase/updatePurchase/${form?.id}`, {
+        name,
+        amount,
+      });
+
+      api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+      return res.data;
+    },
+    onSuccess: async (data) => {
+      try {
+        // ✅ 1. Invalidate so subscribers (e.g. index page) will refetch automatically
+        await queryClient.invalidateQueries({ queryKey: ["purchase"] });
+
+        // ✅ 2. Optionally fetch and refresh the cache immediately
+        await queryClient.fetchQuery({
+          queryKey: ["purchase"],
+          queryFn: async () => {
+            const res = await api.get(`/purchase?userID=${user?.id}`);
+            return res.data;
+          },
+        });
+
+        // ✅ 3. Clean up UI
+        if (editRowMeta?.rowMap && editRowMeta.rowKey) {
+          editRowMeta.rowMap[editRowMeta.rowKey]?.closeRow?.();
+        }
+
+        setEditRowMeta(null);
+        bottomSheetModalRef.current?.dismiss();
+
+        // ✅ 4. Notify user
+        Alert.alert(data.message);
+      } catch (err) {
+        console.error("Error refreshing purchase data:", err);
+        Alert.alert("Error", "Failed to refresh purchase data.");
+      }
+    },
+    onError: (error: any) => {
+      console.log("Response:", error?.response?.data);
+
+      Alert.alert(
+        "Logins failed",
+        error.response?.data?.message || "Something went wrong"
+      );
+    },
+  });
+
   return (
     <ScrollView style={{ paddingHorizontal: 15 }}>
       <View style={{ alignItems: "flex-end", paddingVertical: 15 }}>
-        <Text>Total Purchased: 20</Text>
+        <Text>Total Purchased: {data?.item.length}</Text>
       </View>
       <View>
         <ThemedList
-          items={items}
+          items={data?.item ?? []}
           handleDelete={(id) => handleDelete(id)}
-          handleEdit={(id) => handleEdit(id)}
+          handleEdit={handleEdit}
         />
       </View>
       <CustomBottomSheet
@@ -201,7 +160,11 @@ const recentpurchase = () => {
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onClosePress={handleCloseModalPress}
-        item={selectedItem}
+        inputChange={handleChange}
+        form={form}
+        isLoading={mutation.isPending}
+        onSubmit={() => mutation.mutate()}
+        headerText="Edit Purchase"
       />
     </ScrollView>
   );

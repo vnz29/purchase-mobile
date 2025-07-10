@@ -27,6 +27,7 @@ type Props = {
   form: FormData;
   isLoading: boolean;
   onSubmit: () => void;
+  headerText: string;
 };
 
 const CustomBottomSheet = forwardRef<Ref, Props>(
@@ -39,6 +40,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>(
       inputChange,
       isLoading,
       onSubmit,
+      headerText,
     },
     ref
   ) => {
@@ -57,7 +59,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>(
       >
         <BottomSheetView style={styles.contentContainer}>
           <View style={styles.modalHeader}>
-            <Text style={{ fontSize: 20, fontWeight: 600 }}>Add Puchase</Text>
+            <Text style={{ fontSize: 20, fontWeight: 600 }}>{headerText}</Text>
             <TouchableOpacity onPress={onClosePress} style={styles.closeButton}>
               <Ionicons name="close" size={24} />
             </TouchableOpacity>

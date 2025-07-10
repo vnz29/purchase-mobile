@@ -205,7 +205,7 @@ const Index = () => {
       }
     },
   });
-  console.log(data, "hello");
+
   const renderItem = (item: ItemList) => (
     <View style={styles.itemContainer}>
       <View style={styles.textContainer}>
@@ -224,7 +224,7 @@ const Index = () => {
       </View>
     </View>
   );
-
+  console.log("index page", data);
   return (
     <ThemedHomeView style={styles.container}>
       <ScrollView style={{ paddingHorizontal: 20 }}>
@@ -321,6 +321,7 @@ const Index = () => {
         form={form}
         isLoading={mutation.isPending}
         onSubmit={() => mutation.mutate()}
+        headerText="Add Purchase"
       />
     </ThemedHomeView>
   );

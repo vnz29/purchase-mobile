@@ -9,53 +9,64 @@ import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { SwipeListView } from "react-native-swipe-list-view";
 type ListTypeProps = {
-  id: string;
+  __v: number;
+  _id: string;
+  amount: number;
+  createdAt: string; // ISO date string
+  isDeleted: boolean;
   name: string;
-  price: string;
-  image: string;
-  date: string;
+  updatedAt: string; // ISO date string
+  userId: string;
 };
 type ThemeListProps = {
   items: ListTypeProps[];
   handleDelete: (id: string) => void;
-  handleEdit: (id: ListTypeProps) => void;
+  handleEdit: (
+    id: ListTypeProps,
+    rowMap: { [key: string]: { closeRow: () => void } },
+    rowKey: string
+  ) => void;
 };
 const ThemedList = ({ items, handleDelete, handleEdit }: ThemeListProps) => {
   const renderItem = ({ item }: ListRenderItemInfo<ListTypeProps>) => (
-    <View style={styles.itemContainer}>
+    <View style={styles.itemContainer} key={item._id}>
       <View style={styles.textContainer}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.price}>{item.price}</Text>
+          <Text style={styles.price}>{item.amount}</Text>
         </View>
         <View>
-          <Text style={styles.date}>Purchased on {item.date}</Text>
+          <Text style={styles.date}>Purchased on {item.createdAt}</Text>
         </View>
       </View>
     </View>
   );
 
-  const renderHiddenItem = ({ item }: ListRenderItemInfo<ListTypeProps>) => (
+  const renderHiddenItem = (
+    { item }: ListRenderItemInfo<ListTypeProps>,
+    rowMap: { [key: string]: { closeRow: () => void } }
+  ) => (
     <View style={styles.rowBack}>
       <TouchableOpacity
         style={[styles.actionButton, styles.editBtn]}
-        onPress={() => handleEdit(item)}
+        onPress={() => handleEdit(item, rowMap, item._id)}
       >
         <MaterialIcons name="edit" size={20} color="#fff" />
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.actionButton, styles.deleteBtn]}
-        onPress={() => handleDelete(item.id)}
+        onPress={() => handleDelete(item._id)}
       >
         <MaterialIcons name="delete" size={20} color="#fff" />
       </TouchableOpacity>
     </View>
   );
 
+  console.log(items);
   return (
     <SwipeListView
       data={items}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item._id}
       renderItem={renderItem}
       renderHiddenItem={renderHiddenItem}
       rightOpenValue={-100}
