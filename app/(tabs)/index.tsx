@@ -35,6 +35,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../lib/axios";
 import { useAuthStore } from "../../store/useAuthStore";
 import * as SecureStore from "expo-secure-store";
+import { useBottomSheet } from "../../hooks/useBottomSheet";
 type PurchasedItem = {
   id: string;
   name: string;
@@ -64,97 +65,41 @@ type FormData = {
 };
 
 const Index = () => {
-  const [items, setItems] = useState<PurchasedItem[]>([
-    {
-      id: "1",
-      name: "Wireless Headphones",
-      price: "$99.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 25, 2025",
-    },
-    {
-      id: "2",
-      name: "Bluetooth Speaker",
-      price: "$49.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "3",
-      name: "Bluetooth Speaker",
-      price: "$49.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "4",
-      name: "Bluetooth Speaker",
-      price: "$49.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "5",
-      name: "Bluetooth Speaker",
-      price: "$49.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "6",
-      name: "Bluetooth Speaker",
-      price: "$49.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-    {
-      id: "7",
-      name: "Bluetooth Speaker",
-      price: "$49.99",
-      image: "https://via.placeholder.com/80",
-      date: "June 20, 2025",
-    },
-  ]);
-  // const handleDelete = (id: string) => {
-  //   setItems((prev) => prev.filter((item) => item.id !== id));
-  // };
-
-  // const handleEdit = (item: PurchasedItem) => {
-  //   Alert.alert("Edit Item", `Editing ${item.name}`);
-  // };
-  // code for bottom sheet
-
-  const bottomSheetModalRef = useRef<Ref>(null);
-
-  const snapPoints = useMemo(() => ["45%"], []);
-
-  const handlePresentModalPress = useCallback(() => {
-    console.log("handlePresentModalPress index");
-    bottomSheetModalRef.current?.present();
-  }, []);
-
-  const handleCloseModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.dismiss();
-    console.log("handleCloseModalPress index");
-  }, []);
-
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("Sheet changed to index:", index);
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        bottomSheetModalRef.current?.dismiss();
-      };
-    }, [])
-  );
   const [form, setForm] = useState<FormData>({
     name: "",
     amount: "",
   });
-
   const { user, accessToken } = useAuthStore();
+
+  const queryClient = useQueryClient();
+  const {
+    bottomSheetModalRef,
+    snapPoints,
+    handleCloseModalPress,
+    handlePresentModalPress,
+  } = useBottomSheet(["45%"]);
+  // const bottomSheetModalRef = useRef<Ref>(null);
+  // const snapPoints = useMemo(() => ["45%"], []);
+  // const handlePresentModalPress = useCallback(() => {
+  //   console.log("handlePresentModalPress index");
+  //   bottomSheetModalRef.current?.present();
+  // }, []);
+
+  // const handleCloseModalPress = useCallback(() => {
+  //   bottomSheetModalRef.current?.dismiss();
+  //   console.log("handleCloseModalPress index");
+  // }, []);
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     return () => {
+  //       bottomSheetModalRef.current?.dismiss();
+  //     };
+  //   }, [])
+  // );
+
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("Sheet changed to index:", index);
+  }, []);
 
   const handleChange = (key: keyof FormData, value: string) => {
     setForm((prev) => ({
@@ -162,7 +107,7 @@ const Index = () => {
       [key]: value,
     }));
   };
-  const queryClient = useQueryClient();
+
   const mutation = useMutation({
     mutationFn: async () => {
       const name = form.name;
@@ -179,6 +124,7 @@ const Index = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["purchase"] });
+      bottomSheetModalRef.current?.dismiss();
       Alert.alert("Product successfully added");
     },
     onError: (error: any) => {

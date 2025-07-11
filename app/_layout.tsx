@@ -40,7 +40,7 @@ const RootLayout = () => {
         }
 
         const response = await fetch(
-          "http://192.168.100.78:3000/api/user/refreshToken",
+          "http://192.168.100.163:3000/api/user/refreshToken",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

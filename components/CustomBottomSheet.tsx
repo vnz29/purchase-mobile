@@ -5,26 +5,16 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import ThemedTextInput from "./ThemedTextInput";
 import ThemedText from "./ThemedText";
 import ThemedButton from "./ThemedButton";
+import { FormDataProps, PurchasedItem } from "../types";
 export type Ref = BottomSheetModal;
-type PurchasedItem = {
-  id: string;
-  name: string;
-  price: string;
-  image: string;
-  date: string;
-};
-type FormData = {
-  name: string;
-  amount: string; // use string for input fields, even if number later
-};
 
 type Props = {
   snapPoints: string[];
   onChange?: (index: number) => void;
   onClosePress: () => void;
   item?: PurchasedItem | null; // Add
-  inputChange: (key: keyof FormData, value: string) => void;
-  form: FormData;
+  inputChange: (key: keyof FormDataProps, value: string) => void;
+  form: FormDataProps;
   isLoading: boolean;
   onSubmit: () => void;
   headerText: string;
