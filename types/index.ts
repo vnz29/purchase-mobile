@@ -25,3 +25,6 @@ export type FormDataProps = {
   name: string;
   amount: string; // use string for input fields, even if number later
 };
+export type UpdateFormDataProps = FormDataProps & {
+  id?: string;
+};

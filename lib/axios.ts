@@ -4,7 +4,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import * as SecureStore from "expo-secure-store";
 
 const api = axios.create({
-  baseURL: "http://192.168.100.163:3000/api", // Change this to your IP
+  baseURL: "http://192.168.100.78:3000/api", // Change this to your IP
 });
 
 let isRefreshing = false;
@@ -55,7 +55,7 @@ api.interceptors.response.use(
         if (!refreshToken) throw new Error("No refresh token found");
 
         const res = await axios.post(
-          "http://192.168.100.163:3000/api/user/refreshToken",
+          "http://192.168.100.78:3000/api/user/refreshToken",
           {
             refreshToken,
           }

@@ -36,6 +36,7 @@ import api from "../../lib/axios";
 import { useAuthStore } from "../../store/useAuthStore";
 import * as SecureStore from "expo-secure-store";
 import { useBottomSheet } from "../../hooks/useBottomSheet";
+import { getCurrentPurchase } from "../../api/purchase";
 type PurchasedItem = {
   id: string;
   name: string;
@@ -138,18 +139,21 @@ const Index = () => {
   });
 
   const { data, isLoading } = useQuery<PurchaseResponseHttp>({
-    queryKey: ["purchase"],
-    queryFn: async () => {
-      try {
-        const res = await api.get(`/purchase?userID=${user?.id}`);
-        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+    queryKey: ["purchase", user?.id],
+    queryFn: () => getCurrentPurchase(accessToken!, user?.id!),
 
-        return res.data;
-      } catch (error) {
-        console.error("Error in createTodo:", error);
-        throw error;
-      }
-    },
+    // queryKey: ["purchase"],
+    // queryFn: async () => {
+    //   try {
+    //     const res = await api.get(`/purchase?userID=${user?.id}`);
+    //     api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+
+    //     return res.data;
+    //   } catch (error) {
+    //     console.error("Error in createTodo:", error);
+    //     throw error;
+    //   }
+    // },
   });
 
   const renderItem = (item: ItemList) => (
@@ -170,7 +174,7 @@ const Index = () => {
       </View>
     </View>
   );
-  console.log("index page", data);
+
   return (
     <ThemedHomeView style={styles.container}>
       <ScrollView style={{ paddingHorizontal: 20 }}>

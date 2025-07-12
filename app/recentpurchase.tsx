@@ -5,6 +5,8 @@ import CustomBottomSheet, { Ref } from "../components/CustomBottomSheet";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../lib/axios";
 import { useAuthStore } from "../store/useAuthStore";
+import { UpdateFormDataProps } from "../types";
+import { updateSpecificPurchase } from "../api/purchase";
 type PurchasedItem = {
   id: string;
   name: string;
@@ -36,15 +38,21 @@ type FormData = {
 
 const recentpurchase = () => {
   const queryClient = useQueryClient();
-  const data = queryClient.getQueryData<PurchaseResponseHttp>(["purchase"]);
+  const { user, accessToken } = useAuthStore();
+
+  const data = queryClient.getQueryData<PurchaseResponseHttp>([
+    "purchase",
+    user?.id,
+  ]);
+  console.log(data);
   const [editRowMeta, setEditRowMeta] = useState<{
     rowMap: any;
     rowKey: string;
   } | null>(null);
-  const { user, accessToken } = useAuthStore();
+
   console.log(data);
 
-  const [form, setForm] = useState<FormData>({
+  const [form, setForm] = useState<UpdateFormDataProps>({
     name: "",
     amount: "",
   });
@@ -54,6 +62,7 @@ const recentpurchase = () => {
       [key]: value,
     }));
   };
+
   const handleDelete = (id: string) => {
     console.log("handleDelete");
     // setItems((prev) => prev.filter((item) => item.id !== id));
@@ -91,19 +100,14 @@ const recentpurchase = () => {
     console.log("Sheet changed to index:", index);
   }, []);
 
-  const mutation = useMutation<PurchaseResponseHttp>({
-    mutationFn: async () => {
-      const name = form.name;
-      const amount = parseFloat(form.amount);
-      console.log(form.id);
-      const res = await api.put(`/purchase/updatePurchase/${form?.id}`, {
-        name,
-        amount,
-      });
+  const mutation = useMutation<
+    PurchaseResponseHttp, // TData (success response)
+    Error, // TError
+    UpdateFormDataProps // TVariables (arguments to mutate)
+  >({
+    mutationFn: (form: UpdateFormDataProps, accessToken: string) =>
+      updateSpecificPurchase(form, accessToken),
 
-      api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-      return res.data;
-    },
     onSuccess: async (data) => {
       try {
         // ✅ 1. Invalidate so subscribers (e.g. index page) will refetch automatically
@@ -111,7 +115,7 @@ const recentpurchase = () => {
 
         // ✅ 2. Optionally fetch and refresh the cache immediately
         await queryClient.fetchQuery({
-          queryKey: ["purchase"],
+          queryKey: ["purchase", user?.id],
           queryFn: async () => {
             const res = await api.get(`/purchase?userID=${user?.id}`);
             return res.data;
@@ -163,7 +167,7 @@ const recentpurchase = () => {
         inputChange={handleChange}
         form={form}
         isLoading={mutation.isPending}
-        onSubmit={() => mutation.mutate()}
+        onSubmit={() => mutation.mutate(form, accessToken)}
         headerText="Edit Purchase"
       />
     </ScrollView>
