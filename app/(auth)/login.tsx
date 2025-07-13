@@ -25,7 +25,6 @@ const login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { setUser, setTokens } = useAuthStore();
-
   const mutation = useMutation({
     mutationFn: async () => {
       const res = await api.post("/user/login", { username, password });
@@ -37,9 +36,8 @@ const login = () => {
       return res.data;
     },
     onSuccess: (data) => {
-      console.log(data);
       setUser(data);
-      setTokens(data?.accessToken, data?.refreshToken);
+      setTokens(data.accessToken, data.refreshToken);
       router.replace("/");
     },
     onError: (error: any) => {

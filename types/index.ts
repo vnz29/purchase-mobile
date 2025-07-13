@@ -1,3 +1,4 @@
+// PurchaseType
 export type PurchasedItem = {
   id: string;
   name: string;
@@ -25,6 +26,25 @@ export type FormDataProps = {
   name: string;
   amount: string; // use string for input fields, even if number later
 };
+export type FormData = {
+  id?: string;
+  name: string;
+  amount: string; // use string for input fields, even if number later
+};
+
 export type UpdateFormDataProps = FormDataProps & {
   id?: string;
+};
+export type UpdatePurchaseInput = {
+  form: UpdateFormDataProps;
+  accessToken: string;
+};
+
+export type DeletePurchaseResponseHttp = {
+  message: string;
+};
+
+export type DeletePurchase = {
+  id: string;
+  accessToken: string;
 };

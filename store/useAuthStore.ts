@@ -26,11 +26,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
   setUser: (user) => set({ user: user }),
   setIsLoading: (loading) => set({ isLoading: loading }),
 
-  accessToken: null,
+  accessToken: "",
 
   setTokens: async (accessToken, refreshToken) => {
-    await SecureStore.setItemAsync("refreshToken", refreshToken);
     set({ accessToken });
+    await SecureStore.setItemAsync("refreshToken", refreshToken);
   },
 
   getRefreshToken: async () => {

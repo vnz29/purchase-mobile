@@ -174,7 +174,7 @@ const Index = () => {
       </View>
     </View>
   );
-
+  console.log(accessToken);
   return (
     <ThemedHomeView style={styles.container}>
       <ScrollView style={{ paddingHorizontal: 20 }}>
@@ -257,7 +257,7 @@ const Index = () => {
       </ScrollView>
       <TouchableOpacity
         style={styles.floatingButton}
-        onPress={handlePresentModalPress}
+        onPress={() => handlePresentModalPress()}
       >
         <Octicons name="diff-added" size={18} color="white" />
       </TouchableOpacity>

@@ -18,6 +18,11 @@ type ListTypeProps = {
   updatedAt: string; // ISO date string
   userId: string;
 };
+type DeletePurchase = {
+  id: string;
+  accessToken: string;
+};
+
 type ThemeListProps = {
   items: ListTypeProps[];
   handleDelete: (id: string) => void;
