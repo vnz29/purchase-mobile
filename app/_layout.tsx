@@ -16,7 +16,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as SecureStore from "expo-secure-store";
 import { useAuthStore } from "../store/useAuthStore";
 import * as SplashScreen from "expo-splash-screen";
-
+import { API_URL } from "@env";
 // prevent auto-hiding the splash screen
 SplashScreen.preventAutoHideAsync();
 
@@ -39,14 +39,11 @@ const RootLayout = () => {
           return;
         }
 
-        const response = await fetch(
-          "http://192.168.100.78:3000/api/user/refreshToken",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ refreshToken }),
-          }
-        );
+        const response = await fetch(`${API_URL}/api/user/refreshToken`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refreshToken }),
+        });
 
         if (!response.ok) {
           console.log("Refresh token invalid or expired");
@@ -83,7 +80,7 @@ const RootLayout = () => {
       </View>
     );
   }
-
+  console.log(API_URL);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <BottomSheetModalProvider>

@@ -2,9 +2,9 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useAuthStore } from "../store/useAuthStore";
 import * as SecureStore from "expo-secure-store";
-
+import { API_URL } from "@env";
 const api = axios.create({
-  baseURL: "http://192.168.100.78:3000/api", // Replace with your dev IP or env
+  baseURL: `${API_URL}/api`, // Replace with your dev IP or env
 });
 
 let isRefreshing = false;
@@ -41,10 +41,9 @@ api.interceptors.request.use(
           const refreshToken = await SecureStore.getItemAsync("refreshToken");
           if (!refreshToken) throw new Error("No refresh token");
 
-          const res = await axios.post(
-            "http://192.168.100.78:3000/api/user/refreshToken",
-            { refreshToken }
-          );
+          const res = await axios.post(`${API_URL}/api/user/refreshToken`, {
+            refreshToken,
+          });
 
           const newAccessToken = res.data.accessToken;
           const newRefreshToken = res.data.refreshToken;
