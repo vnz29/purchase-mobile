@@ -1,6 +1,10 @@
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import React, { forwardRef } from "react";
-import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
+import {
+  BottomSheetModal,
+  BottomSheetTextInput,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ThemedTextInput from "./ThemedTextInput";
 import ThemedText from "./ThemedText";
@@ -46,6 +50,8 @@ const CustomBottomSheet = forwardRef<Ref, Props>(
           duration: 300,
         }}
         enableContentPanningGesture={false}
+        keyboardBehavior="interactive"
+        keyboardBlurBehavior="restore"
       >
         <BottomSheetView style={styles.contentContainer}>
           <View style={styles.modalHeader}>
@@ -56,7 +62,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>(
           </View>
           <View style={styles.modalContent}>
             <View>
-              <ThemedTextInput
+              <BottomSheetTextInput
                 style={styles.input}
                 placeholder="Name"
                 value={form?.name}
@@ -64,7 +70,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>(
               />
             </View>
             <View>
-              <ThemedTextInput
+              <BottomSheetTextInput
                 style={styles.input}
                 placeholder="Amount"
                 value={form?.amount}
