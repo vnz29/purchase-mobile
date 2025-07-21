@@ -16,6 +16,7 @@ import { router, useNavigation } from "expo-router";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
+import CustomBottomSheetDatePicker from "../../components/CustomBottomSheetDatePicker";
 
 const history = () => {
   const { user, accessToken } = useAuthStore();
@@ -60,6 +61,7 @@ const history = () => {
   console.log(date);
   return (
     <View>
+      <CustomBottomSheetDatePicker />
       <Button title="Select Date" onPress={() => setShow(true)} />
       <Text>selected: {date.toLocaleString()}</Text>
       {show && (
