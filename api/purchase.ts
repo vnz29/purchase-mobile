@@ -30,7 +30,29 @@ export const getCurrentPurchase = async (
     throw error;
   }
 };
+export const getPurchases = async (
+  accessToken: string,
+  fromDate: string,
+  endDate: string,
+  userID: string
+) => {
+  console.log(fromDate, endDate, userID);
+  try {
+    api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+    const res = await api.get(`/purchase/search`, {
+      params: {
+        start_date: fromDate,
+        end_date: endDate,
+        userID,
+      },
+    });
 
+    return res.data;
+  } catch (error) {
+    console.error("Error in createTodos shit:", error);
+    throw error;
+  }
+};
 export const updateSpecificPurchase = async ({
   form,
   accessToken,

@@ -97,6 +97,13 @@ const RootLayout = () => {
                 headerTitleAlign: "center",
               }}
             />
+            <Stack.Screen
+              name="purchaseDetails"
+              options={{
+                headerShown: true,
+                title: "Purchase Details",
+              }}
+            />
           </Stack>
         </QueryClientProvider>
       </BottomSheetModalProvider>

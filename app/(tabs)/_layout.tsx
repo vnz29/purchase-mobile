@@ -25,12 +25,14 @@ const TabLayout = () => {
   };
   return (
     <Tabs
+      initialRouteName="history"
       screenOptions={{
         // headerStyle: {
         //   backgroundColor: "#34d399",
         // },
         tabBarActiveTintColor: "#34d399",
         freezeOnBlur: true,
+
         headerLeft: () => (
           <Text
             style={{
