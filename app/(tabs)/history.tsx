@@ -7,24 +7,38 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useCurrentMonthRange } from "../../hooks/useCurrentMonthRange";
 import { useQuery } from "@tanstack/react-query";
 import { getPurchases } from "../../api/purchase";
 import { useAuthStore } from "../../store/useAuthStore";
-import { router, useNavigation } from "expo-router";
+import { router, useFocusEffect, useNavigation } from "expo-router";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import CustomBottomSheetDatePicker from "../../components/CustomBottomSheetDatePicker";
-
+import { useBottomSheet } from "../../hooks/useBottomSheet";
+import AntDesign from "@expo/vector-icons/AntDesign";
 const history = () => {
   const { user, accessToken } = useAuthStore();
-  const { fromDate, toDate } = useCurrentMonthRange();
+  const { fromDate, toDate, setFromDate, setToDate, updateDate, resetDates } =
+    useCurrentMonthRange();
+  useFocusEffect(
+    useCallback(() => {
+      // Screen is focused — you can optionally do something here
+
+      return () => {
+        // Screen is unfocused — reset dates
+        resetDates();
+        refetch();
+      };
+    }, [])
+  );
   const navigation = useNavigation();
-  const { data } = useQuery({
+  const { data, refetch, isLoading } = useQuery({
     queryKey: ["purchases"],
     queryFn: () => getPurchases(accessToken!, fromDate, toDate, user?.id!),
+    enabled: Boolean(fromDate && toDate),
   });
   const [date, setDate] = useState<Date>(new Date());
   const [show, setShow] = useState<boolean>(false);
@@ -49,7 +63,7 @@ const history = () => {
   //   ?.flatMap((entry) => entry.purchases)
   //   .reduce((sum, purchase) => sum + purchase.amount, 0);
   // console.log(allPurchases);
-  console.log(data);
+
   const handlePurchasePress = (purchase) => {
     router.push({
       pathname: "/purchaseDetails",
@@ -58,12 +72,37 @@ const history = () => {
       },
     });
   };
-  console.log(date);
+  const {
+    bottomSheetModalRef,
+    snapPoints,
+    handleCloseModalPress,
+    handlePresentModalPress,
+  } = useBottomSheet(["45%"]);
+
+  const handleUpdate = (date: Date, type: string) => {
+    updateDate(date, type);
+  };
+  const handleUpdateDate = () => {
+    refetch();
+  };
   return (
     <View>
-      <CustomBottomSheetDatePicker />
-      <Button title="Select Date" onPress={() => setShow(true)} />
-      <Text>selected: {date.toLocaleString()}</Text>
+      <View>
+        <TouchableOpacity onPress={() => handlePresentModalPress()}>
+          <AntDesign name="filter" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+      <CustomBottomSheetDatePicker
+        ref={bottomSheetModalRef}
+        snapPoints={snapPoints}
+        handleUpdate={handleUpdate}
+        fromDate={fromDate}
+        toDate={toDate}
+        isLoading={isLoading}
+        handleClick={handleUpdateDate}
+        // onClosePress={handleCloseModalPress}
+      />
+
       {show && (
         <DateTimePicker
           value={date}
