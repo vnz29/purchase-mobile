@@ -33,7 +33,7 @@ const isTokenExpired = (token: string): boolean => {
 api.interceptors.request.use(
   async (config) => {
     let accessToken = useAuthStore.getState().accessToken;
-
+    config.headers["X-Platform"] = "mobile";
     if (accessToken && isTokenExpired(accessToken)) {
       if (!isRefreshing) {
         isRefreshing = true;

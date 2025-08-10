@@ -17,6 +17,7 @@ import * as SecureStore from "expo-secure-store";
 import { useAuthStore } from "../store/useAuthStore";
 import * as SplashScreen from "expo-splash-screen";
 import { API_URL } from "@env";
+import Toast from "react-native-toast-message";
 // prevent auto-hiding the splash screen
 SplashScreen.preventAutoHideAsync();
 
@@ -33,7 +34,7 @@ const RootLayout = () => {
     const initAuth = async () => {
       try {
         const refreshToken = await SecureStore.getItemAsync("refreshToken");
-
+        console.log(refreshToken, "refreshToken");
         if (!refreshToken) {
           setIsAuthenticated(false);
           return;
@@ -105,6 +106,7 @@ const RootLayout = () => {
               }}
             />
           </Stack>
+          <Toast />
         </QueryClientProvider>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>

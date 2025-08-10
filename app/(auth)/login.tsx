@@ -1,13 +1,14 @@
 import {
   ActivityIndicator,
   Alert,
+  Button,
   GestureResponderEvent,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import ThemedTextInput from "../../components/ThemedTextInput";
 import ThemedText from "../../components/ThemedText";
@@ -19,30 +20,88 @@ import api from "../../lib/axios";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useMutation } from "@tanstack/react-query";
 import * as SecureStore from "expo-secure-store";
+import * as Google from "expo-auth-session/providers/google";
+import * as WebBrowser from "expo-web-browser";
+import { AuthSessionResult, makeRedirectUri } from "expo-auth-session";
+import ThemedSafeArea from "../../components/ThemedSafeArea";
+// zod and react hook
+
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { AxiosError } from "axios";
+import { LoginHttpResponse } from "../../types";
+WebBrowser.maybeCompleteAuthSession();
+
+const userSchema = z.object({
+  username: z
+    .string()
+    .min(5, { message: "Username must be at least 5 characters." }),
+  password: z
+    .string()
+    .min(5, { message: "Password must be at least 5 characters." }),
+});
+type UserFormType = z.infer<typeof userSchema>;
+
+type GoogleUser = {
+  id: string;
+  email: string;
+  name: string;
+  picture: string;
+};
 
 const login = () => {
   const [value, setValue] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { setUser, setTokens } = useAuthStore();
-  const mutation = useMutation({
-    mutationFn: async () => {
-      const res = await api.post("/user/login", { username, password });
+  const redirectUri = makeRedirectUri({
+    useProxy: true,
+  });
 
+  // const mutation = useMutation({
+  //   mutationFn: async () => {
+  //     const res = await api.post("/user/login", { username, password });
+
+  //     api.defaults.headers.common[
+  //       "Authorization"
+  //     ] = `Bearer ${res.data.accessToken}`;
+
+  //     return res.data;
+  //   },
+  //   onSuccess: (data) => {
+  //     setUser(data);
+  //     setTokens(data.accessToken, data.refreshToken);
+  //     router.replace("/tabs");
+  //   },
+  //   onError: (error: any) => {
+  //     console.log("Response:", error?.response?.data);
+
+  //     Alert.alert(
+  //       "Login failed",
+  //       error.response?.data?.message || "Something went wrong"
+  //     );
+  //   },
+  // });
+  const mutation = useMutation<
+    LoginHttpResponse, // TData: response data type
+    AxiosError, // TError: error type
+    UserFormType // TVariables: data passed to mutate
+  >({
+    mutationFn: async (variables) => {
+      const res = await api.post("/user/login", variables);
       api.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${res.data.accessToken}`;
-
       return res.data;
     },
     onSuccess: (data) => {
+      console.log(data);
       setUser(data);
       setTokens(data.accessToken, data.refreshToken);
-      router.replace("/");
+      router.replace("/tabs");
     },
     onError: (error: any) => {
-      console.log("Response:", error?.response?.data);
-
       Alert.alert(
         "Login failed",
         error.response?.data?.message || "Something went wrong"
@@ -53,8 +112,50 @@ const login = () => {
   const handleLogin = (e: GestureResponderEvent) => {
     console.log("login button clicked");
   };
+  const [users, setUsers] = useState<GoogleUser | null>(null);
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    webClientId:
+      "612895319536-5l11nlkn5199hoie89a120acab7cg0d5.apps.googleusercontent.com",
+    androidClientId:
+      "612895319536-s8ir5810lisv322uipufl4fqfmu1ca4k.apps.googleusercontent.com",
+    scopes: ["profile", "email"],
+    redirectUri: makeRedirectUri({
+      scheme: "purchase-mobile",
+    }),
+    ...{ useProxy: true },
+  });
+  console.log("hello");
+  useEffect(() => {
+    if (response?.type === "success" && response.authentication?.accessToken) {
+      fetchUserInfo(response.authentication.accessToken);
+    }
+  }, [response]);
+
+  const fetchUserInfo = async (token: string) => {
+    try {
+      const res = await fetch("https://www.googleapis.com/userinfo/v2/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data: GoogleUser = await res.json();
+      setUser(data);
+    } catch (err) {
+      console.error("Failed to fetch user info", err);
+    }
+  };
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UserFormType>({
+    resolver: zodResolver(userSchema),
+    defaultValues: { username: "", password: "" },
+  });
+
+  const onSubmit: SubmitHandler<UserFormType> = (data) => mutation.mutate(data);
+
   return (
-    <ThemedView style={styles.container}>
+    <ThemedSafeArea style={styles.container}>
       <View
         style={[
           styles.itemCenter,
@@ -76,19 +177,57 @@ const login = () => {
         <ThemedText style={styles.intro}>Track your spending!</ThemedText>
       </View>
       <View>
-        <ThemedTextInput
+        {/* <ThemedTextInput
           style={styles.input}
           placeholder="Username"
           value={username}
           onChangeText={(text) => setUsername(text)}
+        /> */}
+        <Controller
+          control={control}
+          name="username"
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
+            <>
+              <TextInput
+                style={styles.input}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                placeholder="Username"
+              />
+              {error && <Text style={{ color: "red" }}>{error.message}</Text>}
+            </>
+          )}
         />
       </View>
       <View>
-        <ThemedTextInput
+        {/* <ThemedTextInput
           style={styles.input}
           placeholder="Password"
           value={password}
           onChangeText={(text) => setPassword(text)}
+        /> */}
+        <Controller
+          control={control}
+          name="password"
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => (
+            <>
+              <TextInput
+                style={styles.input}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                placeholder="Username"
+              />
+              {error && <Text style={{ color: "red" }}>{error.message}</Text>}
+            </>
+          )}
         />
       </View>
 
@@ -101,7 +240,7 @@ const login = () => {
           <ActivityIndicator />
         ) : (
           <ThemedButton
-            onPress={() => mutation.mutate()}
+            onPress={handleSubmit(onSubmit)}
             style={styles.loginButton}
           >
             <ThemedText style={styles.fabText}>Login</ThemedText>
@@ -119,10 +258,17 @@ const login = () => {
           </Link>
         </ThemedText>
       </View>
-      <View style={[styles.itemCenter]}>
+      {/* <View style={[styles.itemCenter]}>
         <GoogleSignInButton />
-      </View>
-    </ThemedView>
+      </View> */}
+      {/* <Button
+        title="Sign in with Google"
+        onPress={() => {
+          promptAsync();
+        }}
+        disabled={!request}
+      /> */}
+    </ThemedSafeArea>
   );
 };
 

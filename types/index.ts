@@ -7,7 +7,7 @@ export type PurchasedItem = {
   date: string;
 };
 
-export type ItemList = {
+export type TPurchase = {
   __v: number;
   _id: string;
   amount: number;
@@ -19,7 +19,7 @@ export type ItemList = {
 };
 
 export type PurchaseResponseHttp = {
-  item: ItemList[];
+  item: TPurchase[];
   message: string;
 };
 export type FormDataProps = {
@@ -47,4 +47,34 @@ export type DeletePurchaseResponseHttp = {
 export type DeletePurchase = {
   id: string;
   accessToken: string;
+};
+
+export type CustomBottomSheetDatePickerProps = {
+  snapPoints: string[];
+  handleUpdate: (date: Date, type: string) => void;
+  fromDate: string;
+  toDate: string;
+  isLoading: boolean;
+  handleClick: () => void;
+  headerText: string;
+  onClosePress: () => void;
+};
+
+export type CustomBottomSheetProps = {
+  snapPoints: string[];
+  onChange?: (index: number) => void;
+  onClosePress: () => void;
+  item?: PurchasedItem | null; // Add
+  inputChange: (key: keyof FormDataProps, value: string) => void;
+  form: FormDataProps;
+  isLoading: boolean;
+  onSubmit: () => void;
+  headerText: string;
+};
+export type LoginHttpResponse = {
+  accessToken: string;
+  id: string;
+  message: string;
+  refreshToken: string;
+  username: string;
 };

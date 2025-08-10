@@ -25,17 +25,10 @@ const AuthLayout = () => {
           headerStyle: {
             backgroundColor: theme.navBackground,
           },
-          headerRight: () => (
-            <Pressable
-              onPress={() => alert("Global Help button pressed")}
-              style={{ marginRight: 0 }}
-            >
-              <Ionicons name="help-circle-outline" size={20} color="white" />
-            </Pressable>
-          ),
         }}
       >
         <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="signup" />
       </Stack>
     </>
   );

@@ -36,7 +36,6 @@ export const getPurchases = async (
   endDate: string,
   userID: string
 ) => {
-  console.log(fromDate, endDate, userID);
   try {
     api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
     const res = await api.get(`/purchase/search`, {
@@ -46,10 +45,25 @@ export const getPurchases = async (
         userID,
       },
     });
-
+    console.log("fecthing");
+    console.log(res.data);
     return res.data;
   } catch (error) {
     console.error("Error in createTodos shit:", error);
+    throw error;
+  }
+};
+export const addPurchase = async ({ name, amount, userID, accessToken }) => {
+  try {
+    api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+    const res = await api.post("/purchase/addPurchase", {
+      name,
+      amount,
+      userID,
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error in createTodoss:", error);
     throw error;
   }
 };
@@ -76,12 +90,11 @@ export const deleteSpecificPurchase = async ({
   accessToken,
 }: DeletePurchase): Promise<DeletePurchaseResponseHttp> => {
   try {
-    console.log(id);
     api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
     const res = await api.patch(`/purchase/deletePurchase/${id}`, {
       isDeleted: true,
     });
-    console.log(res);
+
     return res.data;
   } catch (error) {
     console.error("Error in createTodoss:", error);

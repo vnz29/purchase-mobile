@@ -26,7 +26,6 @@ export const useCurrentMonthRange = () => {
       setFromDate(formatLocalDate(start));
       setToDate(formatLocalDate(yesterday));
     }
-    console.log("hello 123");
   }, []);
 
   useEffect(() => {

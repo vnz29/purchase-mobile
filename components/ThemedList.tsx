@@ -8,6 +8,7 @@ import {
 import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { SwipeListView } from "react-native-swipe-list-view";
+import { formatTimeAndDate } from "../utils/formatTimeAndDate";
 type ListTypeProps = {
   __v: number;
   _id: string;
@@ -41,7 +42,7 @@ const ThemedList = ({ items, handleDelete, handleEdit }: ThemeListProps) => {
           <Text style={styles.price}>{item.amount}</Text>
         </View>
         <View>
-          <Text style={styles.date}>Purchased on {item.createdAt}</Text>
+          <Text style={styles.date}>{formatTimeAndDate(item.createdAt)}</Text>
         </View>
       </View>
     </View>

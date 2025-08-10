@@ -21,11 +21,18 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.vnz03.purchasemobile"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-router", "expo-font", "expo-secure-store"]
+    "plugins": ["expo-router", "expo-font", "expo-secure-store"],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "00e7a7c4-6754-4d43-a133-e2a168ed0ac4"
+      }
+    }
   }
 }

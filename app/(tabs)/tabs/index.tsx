@@ -16,57 +16,31 @@ import React, {
   useRef,
   useState,
 } from "react";
-import ThemedCard from "../../components/ThemedCard";
+import ThemedCard from "../../../components/ThemedCard";
 import { MaterialIcons } from "@expo/vector-icons";
 import { SwipeListView } from "react-native-swipe-list-view";
-import ThemedList from "../../components/ThemedList";
-import ThemedText from "../../components/ThemedText";
+import ThemedList from "../../../components/ThemedList";
+import ThemedText from "../../../components/ThemedText";
 import Octicons from "@expo/vector-icons/Octicons";
-import ThemedHomeView from "../../components/ThemedHomeView";
+import ThemedHomeView from "../../../components/ThemedHomeView";
 import BottomSheet, {
   BottomSheetModalProvider,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import CustomBottomSheet, { Ref } from "../../components/CustomBottomSheet";
-import ThemedFlatlist from "../../components/ThemedFlatlist";
+import CustomBottomSheet, { Ref } from "../../../components/CustomBottomSheet";
+import ThemedFlatlist from "../../../components/ThemedFlatlist";
 import { Link, useFocusEffect } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import api from "../../lib/axios";
-import { useAuthStore } from "../../store/useAuthStore";
+import api from "../../../lib/axios";
+import { useAuthStore } from "../../../store/useAuthStore";
 import * as SecureStore from "expo-secure-store";
-import { useBottomSheet } from "../../hooks/useBottomSheet";
-import { getCurrentPurchase } from "../../api/purchase";
-type PurchasedItem = {
-  id: string;
-  name: string;
-  price: string;
-  image: string;
-  date: string;
-};
-
-type ItemList = {
-  __v: number;
-  _id: string;
-  amount: number;
-  createdAt: string; // ISO date string
-  isDeleted: boolean;
-  name: string;
-  updatedAt: string; // ISO date string
-  userId: string;
-};
-
-type PurchaseResponseHttp = {
-  item: ItemList[];
-  message: string;
-};
-type FormData = {
-  name: string;
-  amount: string; // use string for input fields, even if number later
-};
+import { useBottomSheet } from "../../../hooks/useBottomSheet";
+import { getCurrentPurchase } from "../../../api/purchase";
+import { FormDataProps, PurchaseResponseHttp, TPurchase } from "../../../types";
 
 const Index = () => {
-  const [form, setForm] = useState<FormData>({
+  const [form, setForm] = useState<FormDataProps>({
     name: "",
     amount: "",
   });
@@ -79,30 +53,12 @@ const Index = () => {
     handleCloseModalPress,
     handlePresentModalPress,
   } = useBottomSheet(["45%"]);
-  // const bottomSheetModalRef = useRef<Ref>(null);
-  // const snapPoints = useMemo(() => ["45%"], []);
-  // const handlePresentModalPress = useCallback(() => {
-  //   console.log("handlePresentModalPress index");
-  //   bottomSheetModalRef.current?.present();
-  // }, []);
-
-  // const handleCloseModalPress = useCallback(() => {
-  //   bottomSheetModalRef.current?.dismiss();
-  //   console.log("handleCloseModalPress index");
-  // }, []);
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     return () => {
-  //       bottomSheetModalRef.current?.dismiss();
-  //     };
-  //   }, [])
-  // );
 
   const handleSheetChanges = useCallback((index: number) => {
     console.log("Sheet changed to index:", index);
   }, []);
 
-  const handleChange = (key: keyof FormData, value: string) => {
+  const handleChange = (key: keyof FormDataProps, value: string) => {
     setForm((prev) => ({
       ...prev,
       [key]: value,
@@ -141,22 +97,9 @@ const Index = () => {
   const { data, isLoading } = useQuery<PurchaseResponseHttp>({
     queryKey: ["purchase", user?.id],
     queryFn: () => getCurrentPurchase(accessToken!, user?.id!),
-
-    // queryKey: ["purchase"],
-    // queryFn: async () => {
-    //   try {
-    //     const res = await api.get(`/purchase?userID=${user?.id}`);
-    //     api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-
-    //     return res.data;
-    //   } catch (error) {
-    //     console.error("Error in createTodo:", error);
-    //     throw error;
-    //   }
-    // },
   });
 
-  const renderItem = (item: ItemList) => (
+  const renderItem = (item: TPurchase) => (
     <View style={styles.itemContainer}>
       <View style={styles.textContainer}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
@@ -174,7 +117,7 @@ const Index = () => {
       </View>
     </View>
   );
-  console.log(accessToken);
+
   return (
     <ThemedHomeView style={styles.container}>
       <ScrollView style={{ paddingHorizontal: 20 }}>
@@ -195,7 +138,7 @@ const Index = () => {
             {/* Top content */}
             <View>
               <Text style={{ color: "white", fontSize: 18, fontWeight: 600 }}>
-                Welcome, User
+                Welcome, {user?.username}
               </Text>
             </View>
 

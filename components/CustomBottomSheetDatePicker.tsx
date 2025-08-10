@@ -5,26 +5,35 @@ import {
   TouchableOpacity,
   Platform,
   StyleSheet,
+  Text,
 } from "react-native";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import Icon from "react-native-vector-icons/MaterialIcons";
+
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import ThemedButton from "./ThemedButton";
 import ThemedText from "./ThemedText";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { CustomBottomSheetDatePickerProps } from "../types";
 export type Ref = BottomSheetModal;
-type Props = {
-  snapPoints: string[];
-  handleUpdate: (date: Date, type: string) => void;
-  fromDate: string;
-  toDate: string;
-  isLoading: boolean;
-  handleClick: () => void;
-};
-const CustomBottomSheetDatePicker = forwardRef<Ref, Props>(
+
+const CustomBottomSheetDatePicker = forwardRef<
+  Ref,
+  CustomBottomSheetDatePickerProps
+>(
   (
-    { snapPoints, handleUpdate, fromDate, toDate, isLoading, handleClick },
+    {
+      snapPoints,
+      handleUpdate,
+      fromDate,
+      toDate,
+      isLoading,
+      handleClick,
+      headerText,
+      onClosePress,
+    },
     ref
   ) => {
     const [date, setDate] = useState<Date>(new Date());
@@ -51,7 +60,6 @@ const CustomBottomSheetDatePicker = forwardRef<Ref, Props>(
         ? setFromDateShowPicker(true)
         : setToDateShowPicker(true);
     };
-    console.log(fromDate, toDate, "sheet");
 
     return (
       <BottomSheetModal
@@ -68,6 +76,12 @@ const CustomBottomSheetDatePicker = forwardRef<Ref, Props>(
         keyboardBlurBehavior="restore"
       >
         <BottomSheetView style={styles.contentContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={{ fontSize: 20, fontWeight: 600 }}>{headerText}</Text>
+            <TouchableOpacity onPress={onClosePress} style={styles.closeButton}>
+              <Ionicons name="close" size={24} />
+            </TouchableOpacity>
+          </View>
           <View style={styles.container}>
             <TextInput
               style={styles.input}
@@ -79,7 +93,7 @@ const CustomBottomSheetDatePicker = forwardRef<Ref, Props>(
               onPress={() => showDatePicker("from-date")}
               style={styles.icon}
             >
-              <Icon name="calendar-today" size={24} color="#000" />
+              <AntDesign name="calendar" size={24} color="black" />
             </TouchableOpacity>
 
             {fromDateShowPicker && (
@@ -103,7 +117,7 @@ const CustomBottomSheetDatePicker = forwardRef<Ref, Props>(
               onPress={() => showDatePicker("to-date")}
               style={styles.icon}
             >
-              <Icon name="calendar-today" size={24} color="#000" />
+              <AntDesign name="calendar" size={24} color="black" />
             </TouchableOpacity>
 
             {toDateShowPicker && (
@@ -119,7 +133,7 @@ const CustomBottomSheetDatePicker = forwardRef<Ref, Props>(
           <View style={[styles.itemCenter, { marginTop: 20 }]}>
             <ThemedButton style={styles.loginButton} onPress={handleClick}>
               <ThemedText style={styles.fabText}>
-                {isLoading ? "Loading" : "Add"}
+                {isLoading ? "Loading" : "Search"}
               </ThemedText>
             </ThemedButton>
           </View>
@@ -168,6 +182,12 @@ const styles = StyleSheet.create({
     fontWeight: 700,
     textAlign: "center",
   },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 15,
+  },
+  closeButton: {},
 });
 
 export default CustomBottomSheetDatePicker;

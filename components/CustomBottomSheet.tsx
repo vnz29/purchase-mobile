@@ -9,22 +9,10 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import ThemedTextInput from "./ThemedTextInput";
 import ThemedText from "./ThemedText";
 import ThemedButton from "./ThemedButton";
-import { FormDataProps, PurchasedItem } from "../types";
+import { CustomBottomSheetProps, FormDataProps, PurchasedItem } from "../types";
 export type Ref = BottomSheetModal;
 
-type Props = {
-  snapPoints: string[];
-  onChange?: (index: number) => void;
-  onClosePress: () => void;
-  item?: PurchasedItem | null; // Add
-  inputChange: (key: keyof FormDataProps, value: string) => void;
-  form: FormDataProps;
-  isLoading: boolean;
-  onSubmit: () => void;
-  headerText: string;
-};
-
-const CustomBottomSheet = forwardRef<Ref, Props>(
+const CustomBottomSheet = forwardRef<Ref, CustomBottomSheetProps>(
   (
     {
       snapPoints,
