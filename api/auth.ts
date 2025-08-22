@@ -7,6 +7,7 @@ type tokenProps = {
 export const logOutUser = async (accessToken: string) => {
   const refreshToken = await SecureStore.getItemAsync("refreshToken");
   try {
+    console.log(accessToken);
     api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
     const res = await api.post(`/user/logout`, { refreshToken: refreshToken });
     console.log(res);

@@ -5,9 +5,11 @@ import {
   StyleSheet,
   useColorScheme,
   View,
+  Text,
+  TouchableOpacity,
 } from "react-native";
 import React, { use, useEffect, useState } from "react";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { Colors } from "../constant/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -18,6 +20,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import * as SplashScreen from "expo-splash-screen";
 import { API_URL } from "@env";
 import Toast from "react-native-toast-message";
+
 // prevent auto-hiding the splash screen
 SplashScreen.preventAutoHideAsync();
 
@@ -25,8 +28,8 @@ const queryClient = new QueryClient();
 
 const RootLayout = () => {
   const [appReady, setAppReady] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  const { isAuthenticated } = useAuthStore();
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme === "dark" ? "dark" : "light"];
 
@@ -34,9 +37,10 @@ const RootLayout = () => {
     const initAuth = async () => {
       try {
         const refreshToken = await SecureStore.getItemAsync("refreshToken");
-        console.log(refreshToken, "refreshToken");
+
         if (!refreshToken) {
-          setIsAuthenticated(false);
+          useAuthStore.getState().isLoggedIn(false);
+          // setIsAuthenticated(false);
           return;
         }
 
@@ -49,7 +53,8 @@ const RootLayout = () => {
         if (!response.ok) {
           console.log("Refresh token invalid or expired");
           await SecureStore.deleteItemAsync("refreshToken");
-          setIsAuthenticated(false);
+          useAuthStore.getState().isLoggedIn(false);
+          // setIsAuthenticated(false);
           return;
         }
 
@@ -61,10 +66,12 @@ const RootLayout = () => {
         //await SecureStore.setItemAsync("refreshToken", newRefreshToken);
         useAuthStore.getState().setTokens(accessToken, refreshToken);
         useAuthStore.getState().setUser({ id: userId, username: username });
-        setIsAuthenticated(true);
+        useAuthStore.getState().isLoggedIn(true);
+        // setIsAuthenticated(true);
       } catch (err) {
         console.error("Auth check failed", err);
-        setIsAuthenticated(false);
+        useAuthStore.getState().isLoggedIn(false);
+        // setIsAuthenticated(false);
       } finally {
         setAppReady(true);
         SplashScreen.hideAsync();
@@ -81,12 +88,12 @@ const RootLayout = () => {
       </View>
     );
   }
-  console.log(API_URL);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <BottomSheetModalProvider>
         <QueryClientProvider client={queryClient}>
-          <Stack
+          {/* <Stack
             initialRouteName={isAuthenticated ? "(tabs)" : "(auth)"}
             screenOptions={{ headerShown: false }}
           >
@@ -105,6 +112,30 @@ const RootLayout = () => {
                 title: "Purchase Details",
               }}
             />
+          </Stack> */}
+          <Stack>
+            <Stack.Protected guard={isAuthenticated}>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="recentpurchase"
+                options={{
+                  headerShown: true,
+                  title: "Purchases",
+                  headerTitleAlign: "center",
+                }}
+              />
+
+              <Stack.Screen
+                name="purchaseDetails"
+                options={{
+                  headerShown: true,
+                  title: "Purchase Details",
+                }}
+              />
+            </Stack.Protected>
+            <Stack.Protected guard={!isAuthenticated}>
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            </Stack.Protected>
           </Stack>
           <Toast />
         </QueryClientProvider>

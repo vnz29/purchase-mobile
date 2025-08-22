@@ -54,35 +54,11 @@ const login = () => {
   const [value, setValue] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { setUser, setTokens } = useAuthStore();
-  const redirectUri = makeRedirectUri({
-    useProxy: true,
-  });
-
-  // const mutation = useMutation({
-  //   mutationFn: async () => {
-  //     const res = await api.post("/user/login", { username, password });
-
-  //     api.defaults.headers.common[
-  //       "Authorization"
-  //     ] = `Bearer ${res.data.accessToken}`;
-
-  //     return res.data;
-  //   },
-  //   onSuccess: (data) => {
-  //     setUser(data);
-  //     setTokens(data.accessToken, data.refreshToken);
-  //     router.replace("/tabs");
-  //   },
-  //   onError: (error: any) => {
-  //     console.log("Response:", error?.response?.data);
-
-  //     Alert.alert(
-  //       "Login failed",
-  //       error.response?.data?.message || "Something went wrong"
-  //     );
-  //   },
+  const { setUser, setTokens, isLoggedIn } = useAuthStore();
+  // const redirectUri = makeRedirectUri({
+  //   useProxy: true,
   // });
+
   const mutation = useMutation<
     LoginHttpResponse, // TData: response data type
     AxiosError, // TError: error type
@@ -98,8 +74,9 @@ const login = () => {
     onSuccess: (data) => {
       console.log(data);
       setUser(data);
+      isLoggedIn(true);
       setTokens(data.accessToken, data.refreshToken);
-      router.replace("/tabs");
+      router.replace("/(tabs)");
     },
     onError: (error: any) => {
       Alert.alert(

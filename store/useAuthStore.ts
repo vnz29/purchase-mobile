@@ -16,7 +16,8 @@ type AuthStore = {
   setIsLoading: (loading: boolean) => void;
   logout: () => void;
   accessToken: string | null;
-
+  isAuthenticated: boolean;
+  isLoggedIn: (authenticated: boolean) => void;
   setTokens: (accessToken: string, refreshToken: string) => Promise<void>;
   getRefreshToken: () => Promise<string | null>;
 };
@@ -28,12 +29,14 @@ export const useAuthStore = create<AuthStore>((set) => ({
   setIsLoading: (loading) => set({ isLoading: loading }),
 
   accessToken: "",
-
+  isAuthenticated: false,
   setTokens: async (accessToken, refreshToken) => {
     set({ accessToken });
     await SecureStore.setItemAsync("refreshToken", refreshToken);
   },
-
+  isLoggedIn: (authenticated) => {
+    set({ isAuthenticated: authenticated });
+  },
   getRefreshToken: async () => {
     return await SecureStore.getItemAsync("refreshToken");
   },

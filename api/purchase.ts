@@ -20,13 +20,14 @@ export const getCurrentPurchase = async (
   userId: string
 ) => {
   // const { user, accessToken } = useAuthStore();
+  console.log(accessToken, "purchase accesstoken");
   try {
     api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
     const res = await api.get(`/purchase?userID=${userId}`);
 
     return res.data;
   } catch (error) {
-    console.error("Error in createTodos shit:", error);
+    console.error("Error in createTodos shitss:", error);
     throw error;
   }
 };
@@ -45,11 +46,10 @@ export const getPurchases = async (
         userID,
       },
     });
-    console.log("fecthing");
-    console.log(res.data);
+
     return res.data;
   } catch (error) {
-    console.error("Error in createTodos shit:", error);
+    console.error("Error in createTodos shits:", error);
     throw error;
   }
 };
@@ -71,6 +71,7 @@ export const updateSpecificPurchase = async ({
   form,
   accessToken,
 }: UpdatePurchaseInput): Promise<PurchaseResponseHttp> => {
+  console.log(form);
   try {
     api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
     const res = await api.put(`/purchase/updatePurchase/${form?.id}`, {

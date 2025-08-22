@@ -1,3 +1,10 @@
+import z from "zod";
+import {
+  Control,
+  FieldErrors,
+  UseFormHandleSubmit,
+  UseFormReset,
+} from "react-hook-form";
 // PurchaseType
 export type PurchasedItem = {
   id: string;
@@ -24,7 +31,8 @@ export type PurchaseResponseHttp = {
 };
 export type FormDataProps = {
   name: string;
-  amount: string; // use string for input fields, even if number later
+  amount: string;
+  id?: string; // use string for input fields, even if number later
 };
 export type FormData = {
   id?: string;
@@ -71,10 +79,37 @@ export type CustomBottomSheetProps = {
   onSubmit: () => void;
   headerText: string;
 };
+
 export type LoginHttpResponse = {
   accessToken: string;
   id: string;
   message: string;
   refreshToken: string;
   username: string;
+};
+
+export const PurchaseSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  amount: z.string().min(1, "Amount is required"),
+  id: z.string().min(1).optional(),
+});
+
+export type PurchaseFormData = z.infer<typeof PurchaseSchema>;
+
+export type CustomBottomSheetPropss = {
+  snapPoints: string[];
+  onChange?: (index: number) => void;
+  onClosePress: () => void;
+  item?: PurchasedItem | null; // Add
+
+  isLoading: boolean;
+
+  headerText: string;
+  control: Control<PurchaseFormData>;
+
+  errors: FieldErrors<PurchaseFormData>;
+  reset: UseFormReset<PurchaseFormData>;
+
+  handleSubmit: UseFormHandleSubmit<PurchaseFormData>;
+  onSubmit: (data: PurchaseFormData) => void;
 };

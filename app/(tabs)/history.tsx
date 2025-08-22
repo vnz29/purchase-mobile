@@ -9,19 +9,19 @@ import {
   View,
 } from "react-native";
 import React, { useCallback, useState } from "react";
-import { useCurrentMonthRange } from "../../../hooks/useCurrentMonthRange";
+import { useCurrentMonthRange } from "../../hooks/useCurrentMonthRange";
 import { useQuery } from "@tanstack/react-query";
-import { getPurchases } from "../../../api/purchase";
-import { useAuthStore } from "../../../store/useAuthStore";
+import { getPurchases } from "../../api/purchase";
+import { useAuthStore } from "../../store/useAuthStore";
 import { router, useFocusEffect, useNavigation } from "expo-router";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import CustomBottomSheetDatePicker from "../../../components/CustomBottomSheetDatePicker";
-import { useBottomSheet } from "../../../hooks/useBottomSheet";
+import CustomBottomSheetDatePicker from "../../components/CustomBottomSheetDatePicker";
+import { useBottomSheet } from "../../hooks/useBottomSheet";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { TPurchase } from "../../../types";
-import { formatTimeAndDate } from "../../../utils/formatTimeAndDate";
+import { TPurchase } from "../../types";
+import { formatTimeAndDate } from "../../utils/formatTimeAndDate";
 const history = () => {
   const [date, setDate] = useState<Date>(new Date());
   const [show, setShow] = useState<boolean>(false);
@@ -74,7 +74,7 @@ const history = () => {
     handleCloseModalPress();
   };
   if (isFetching) {
-    return <ActivityIndicator size="large" />;
+    return <ActivityIndicator style={{ flex: 1 }} size="large" />;
   }
   return (
     <View>

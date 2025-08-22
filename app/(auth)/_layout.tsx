@@ -22,13 +22,11 @@ const AuthLayout = () => {
       <StatusBar style="auto" />
       <Stack
         screenOptions={{
-          headerStyle: {
-            backgroundColor: theme.navBackground,
-          },
+          headerStyle: {},
         }}
       >
         <Stack.Screen name="login" options={{ headerShown: false }} />
-        <Stack.Screen name="signup" />
+        <Stack.Screen name="Signup" />
       </Stack>
     </>
   );

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, Button, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
 import ThemedCard from "../components/ThemedCard";

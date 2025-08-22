@@ -14,11 +14,13 @@ type EditRowMeta = {
 type UseUpdatePurchaseProps = {
   userId?: string;
   bottomSheetModalRef: RefObject<BottomSheetModal | null>; //
+  reset: () => void;
 };
 
 export function useUpdatePurchase({
   userId,
   bottomSheetModalRef,
+  reset,
 }: UseUpdatePurchaseProps) {
   const queryClient = useQueryClient();
   const [editRowMeta, setEditRowMeta] = useState<EditRowMeta>(null);
@@ -38,6 +40,7 @@ export function useUpdatePurchase({
         if (editRowMeta?.rowMap && editRowMeta.rowKey) {
           editRowMeta.rowMap[editRowMeta.rowKey]?.closeRow?.();
         }
+        reset();
         setEditRowMeta(null);
         bottomSheetModalRef.current?.dismiss();
       } catch (err) {

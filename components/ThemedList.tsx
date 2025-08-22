@@ -59,6 +59,7 @@ const ThemedList = ({ items, handleDelete, handleEdit }: ThemeListProps) => {
       >
         <MaterialIcons name="edit" size={20} color="#fff" />
       </TouchableOpacity>
+
       <TouchableOpacity
         style={[styles.actionButton, styles.deleteBtn]}
         onPress={() => handleDelete(item._id)}
@@ -68,7 +69,6 @@ const ThemedList = ({ items, handleDelete, handleEdit }: ThemeListProps) => {
     </View>
   );
 
-  console.log(items);
   return (
     <SwipeListView
       data={items}
@@ -138,6 +138,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 40,
   },
   editBtn: {
     backgroundColor: "#007bff",

@@ -9,20 +9,28 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import ThemedTextInput from "./ThemedTextInput";
 import ThemedText from "./ThemedText";
 import ThemedButton from "./ThemedButton";
-import { CustomBottomSheetProps, FormDataProps, PurchasedItem } from "../types";
+import {
+  CustomBottomSheetPropss,
+  FormDataProps,
+  PurchasedItem,
+} from "../types";
+import { Controller } from "react-hook-form";
 export type Ref = BottomSheetModal;
 
-const CustomBottomSheet = forwardRef<Ref, CustomBottomSheetProps>(
+const CustomBottomSheet = forwardRef<Ref, CustomBottomSheetPropss>(
   (
     {
       snapPoints,
       onChange,
       onClosePress,
-      form,
-      inputChange,
+
       isLoading,
       onSubmit,
       headerText,
+      control,
+      handleSubmit,
+      errors,
+      reset,
     },
     ref
   ) => {
@@ -50,24 +58,69 @@ const CustomBottomSheet = forwardRef<Ref, CustomBottomSheetProps>(
           </View>
           <View style={styles.modalContent}>
             <View>
-              <BottomSheetTextInput
+              <Controller
+                control={control}
+                name="name"
+                render={({ field: { onChange, value, onBlur } }) => (
+                  <>
+                    <BottomSheetTextInput
+                      style={styles.input}
+                      placeholder="Name"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                    />
+                    {errors.name && (
+                      <Text style={{ color: "red", marginBottom: 8 }}>
+                        {errors.name.message}
+                      </Text>
+                    )}
+                  </>
+                )}
+              />
+              {/* <BottomSheetTextInput
                 style={styles.input}
                 placeholder="Name"
                 value={form?.name}
                 onChangeText={(text) => inputChange("name", text)}
-              />
+              /> */}
             </View>
             <View>
-              <BottomSheetTextInput
+              {/* <BottomSheetTextInput
                 style={styles.input}
                 placeholder="Amount"
                 value={form?.amount}
                 onChangeText={(text) => inputChange("amount", text)}
                 keyboardType="numeric"
+              /> */}
+              <Controller
+                control={control}
+                name="amount"
+                render={({ field: { onChange, value, onBlur } }) => (
+                  <>
+                    <BottomSheetTextInput
+                      style={styles.input}
+                      placeholder="Amount"
+                      value={value}
+                      keyboardType="numeric"
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                    />
+                    {errors.amount && (
+                      <Text style={{ color: "red", marginBottom: 8 }}>
+                        {errors.amount.message}
+                      </Text>
+                    )}
+                  </>
+                )}
               />
             </View>
             <View style={[styles.itemCenter, { marginTop: 20 }]}>
-              <ThemedButton style={styles.loginButton} onPress={onSubmit}>
+              {/* <ThemedButton style={styles.loginButton} onPress={onSubmit}> */}
+              <ThemedButton
+                style={styles.loginButton}
+                onPress={handleSubmit(onSubmit)}
+              >
                 <ThemedText style={styles.fabText}>
                   {isLoading ? "Loading" : "Add"}
                 </ThemedText>

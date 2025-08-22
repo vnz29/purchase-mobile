@@ -16,36 +16,38 @@ import React, {
   useRef,
   useState,
 } from "react";
-import ThemedCard from "../../../components/ThemedCard";
-import { MaterialIcons } from "@expo/vector-icons";
-import { SwipeListView } from "react-native-swipe-list-view";
-import ThemedList from "../../../components/ThemedList";
-import ThemedText from "../../../components/ThemedText";
+import ThemedCard from "../../components/ThemedCard";
+
 import Octicons from "@expo/vector-icons/Octicons";
-import ThemedHomeView from "../../../components/ThemedHomeView";
-import BottomSheet, {
-  BottomSheetModalProvider,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import CustomBottomSheet, { Ref } from "../../../components/CustomBottomSheet";
-import ThemedFlatlist from "../../../components/ThemedFlatlist";
-import { Link, useFocusEffect } from "expo-router";
+import ThemedHomeView from "../../components/ThemedHomeView";
+
+import CustomBottomSheet, { Ref } from "../../components/CustomBottomSheet";
+import ThemedFlatlist from "../../components/ThemedFlatlist";
+import { Link, useFocusEffect, useRouter } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import api from "../../../lib/axios";
-import { useAuthStore } from "../../../store/useAuthStore";
-import * as SecureStore from "expo-secure-store";
-import { useBottomSheet } from "../../../hooks/useBottomSheet";
-import { getCurrentPurchase } from "../../../api/purchase";
-import { FormDataProps, PurchaseResponseHttp, TPurchase } from "../../../types";
+import api from "../../lib/axios";
+import { useAuthStore } from "../../store/useAuthStore";
+
+import { useBottomSheet } from "../../hooks/useBottomSheet";
+import { getCurrentPurchase } from "../../api/purchase";
+import {
+  FormDataProps,
+  PurchaseFormData,
+  PurchaseResponseHttp,
+  PurchaseSchema,
+  TPurchase,
+} from "../../types";
+
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { AxiosError } from "axios";
 
 const Index = () => {
-  const [form, setForm] = useState<FormDataProps>({
-    name: "",
-    amount: "",
-  });
-  const { user, accessToken } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
 
+  const { user, accessToken } = useAuthStore();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const {
     bottomSheetModalRef,
@@ -58,21 +60,20 @@ const Index = () => {
     console.log("Sheet changed to index:", index);
   }, []);
 
-  const handleChange = (key: keyof FormDataProps, value: string) => {
-    setForm((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
+  const closeModal = () => {
+    reset();
+    handleCloseModalPress();
   };
 
-  const mutation = useMutation({
-    mutationFn: async () => {
-      const name = form.name;
-      const amount = parseFloat(form.amount);
-
+  const mutation = useMutation<
+    PurchaseResponseHttp, // TData: response data type
+    AxiosError, // TError: error type
+    PurchaseFormData // TVariables: data passed to mutate
+  >({
+    mutationFn: async (variables) => {
       const res = await api.post("/purchase/addPurchase", {
-        name,
-        amount,
+        name: variables.name,
+        amount: parseFloat(variables.amount),
         userID: user?.id,
       });
 
@@ -81,6 +82,7 @@ const Index = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["purchase"] });
+      reset();
       bottomSheetModalRef.current?.dismiss();
       Alert.alert("Product successfully added");
     },
@@ -94,10 +96,33 @@ const Index = () => {
     },
   });
 
+  useFocusEffect(
+    useCallback(() => {
+      return () => {};
+    }, [])
+  );
+
   const { data, isLoading } = useQuery<PurchaseResponseHttp>({
     queryKey: ["purchase", user?.id],
     queryFn: () => getCurrentPurchase(accessToken!, user?.id!),
+    enabled: isAuthenticated,
   });
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<PurchaseFormData>({
+    resolver: zodResolver(PurchaseSchema),
+    defaultValues: {
+      name: "",
+      amount: "",
+    },
+  });
+  const onSubmit: SubmitHandler<PurchaseFormData> = (data) => {
+    mutation.mutate(data);
+  };
 
   const renderItem = (item: TPurchase) => (
     <View style={styles.itemContainer}>
@@ -124,13 +149,7 @@ const Index = () => {
         <View style={{ paddingVertical: 10 }}>
           <Text style={{ fontSize: 22, fontWeight: 600 }}>Dashboard</Text>
         </View>
-        <Button
-          title="Clear SecureStore"
-          onPress={async () => {
-            await SecureStore.deleteItemAsync("refreshToken");
-            alert("SecureStore cleared");
-          }}
-        />
+
         <ThemedCard
           style={{ paddingHorizontal: 20, paddingVertical: 20, height: 150 }}
         >
@@ -172,7 +191,9 @@ const Index = () => {
             <Text style={{ fontSize: 16, fontWeight: 700 }}>
               Product Purchased:
             </Text>
-            <Link href="/recentpurchase">See all</Link>
+            <TouchableOpacity onPress={() => router.push("recentpurchase")}>
+              <Text>See all</Text>
+            </TouchableOpacity>
           </View>
           {isLoading ? (
             <View
@@ -209,12 +230,17 @@ const Index = () => {
         ref={bottomSheetModalRef}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
-        onClosePress={handleCloseModalPress}
-        inputChange={handleChange}
-        form={form}
+        onClosePress={closeModal}
         isLoading={mutation.isPending}
-        onSubmit={() => mutation.mutate()}
+        // onSubmit={() => mutation.mutate()}
         headerText="Add Purchase"
+        // zod
+        control={control}
+        // handleSubmit={() => handleSubmit(onSubmit)}
+        errors={errors}
+        reset={reset}
+        handleSubmit={handleSubmit}
+        onSubmit={onSubmit}
       />
     </ThemedHomeView>
   );
