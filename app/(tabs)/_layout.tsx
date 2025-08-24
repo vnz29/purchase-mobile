@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useRef } from "react";
+import React from "react";
 import { Tabs, useNavigation, useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Octicons from "@expo/vector-icons/Octicons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
@@ -12,22 +12,10 @@ import { DrawerNavigationProp } from "@react-navigation/drawer";
 const TabLayout = () => {
   const router = useRouter();
   const navigation = useNavigation<DrawerNavigationProp<any>>();
-  // const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-  // const handleProfilePress = () => {
-  //   try {
-  //     bottomSheetModalRef.current?.present();
-  //     console.log("Display bottom sheet");
-  //   } catch (error) {
-  //     console.log("Error: ", error);
-  //   }
-  // };
   return (
     <Tabs
       screenOptions={{
-        // headerStyle: {
-        //   backgroundColor: "#34d399",
-        // },
         tabBarActiveTintColor: "#34d399",
         freezeOnBlur: true,
 

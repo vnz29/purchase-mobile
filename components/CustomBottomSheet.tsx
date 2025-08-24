@@ -6,14 +6,10 @@ import {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import ThemedTextInput from "./ThemedTextInput";
+
 import ThemedText from "./ThemedText";
 import ThemedButton from "./ThemedButton";
-import {
-  CustomBottomSheetPropss,
-  FormDataProps,
-  PurchasedItem,
-} from "../types";
+import { CustomBottomSheetPropss } from "../types";
 import { Controller } from "react-hook-form";
 export type Ref = BottomSheetModal;
 

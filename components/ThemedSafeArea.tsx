@@ -1,11 +1,4 @@
-import {
-  StyleProp,
-  Text,
-  useColorScheme,
-  View,
-  ViewProps,
-  ViewStyle,
-} from "react-native";
+import { StyleProp, useColorScheme, ViewProps, ViewStyle } from "react-native";
 import React from "react";
 import { Colors } from "../constant/Colors";
 import {

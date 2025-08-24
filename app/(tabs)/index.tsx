@@ -1,21 +1,13 @@
 import {
   ActivityIndicator,
   Alert,
-  Button,
-  ListRenderItemInfo,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback } from "react";
 import ThemedCard from "../../components/ThemedCard";
 
 import Octicons from "@expo/vector-icons/Octicons";
@@ -31,7 +23,6 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useBottomSheet } from "../../hooks/useBottomSheet";
 import { getCurrentPurchase } from "../../api/purchase";
 import {
-  FormDataProps,
   PurchaseFormData,
   PurchaseResponseHttp,
   PurchaseSchema,

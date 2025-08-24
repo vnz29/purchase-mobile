@@ -1,7 +1,6 @@
 import {
   ActivityIndicator,
   Alert,
-  Button,
   GestureResponderEvent,
   StyleSheet,
   Text,
@@ -9,20 +8,18 @@ import {
   View,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { StatusBar } from "expo-status-bar";
-import ThemedTextInput from "../../components/ThemedTextInput";
+
 import ThemedText from "../../components/ThemedText";
 import ThemedButton from "../../components/ThemedButton";
-import ThemedView from "../../components/ThemedView";
-import GoogleSignInButton from "../../components/GoogleSignInButton";
+
 import { Link, router } from "expo-router";
 import api from "../../lib/axios";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useMutation } from "@tanstack/react-query";
-import * as SecureStore from "expo-secure-store";
+
 import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
-import { AuthSessionResult, makeRedirectUri } from "expo-auth-session";
+import { makeRedirectUri } from "expo-auth-session";
 import ThemedSafeArea from "../../components/ThemedSafeArea";
 // zod and react hook
 
@@ -51,9 +48,6 @@ type GoogleUser = {
 };
 
 const login = () => {
-  const [value, setValue] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const { setUser, setTokens, isLoggedIn } = useAuthStore();
   // const redirectUri = makeRedirectUri({
   //   useProxy: true,
@@ -72,17 +66,14 @@ const login = () => {
       return res.data;
     },
     onSuccess: (data) => {
-      console.log(data);
       setUser(data);
       isLoggedIn(true);
       setTokens(data.accessToken, data.refreshToken);
       router.replace("/(tabs)");
     },
     onError: (error: any) => {
-      Alert.alert(
-        "Login failed",
-        error.response?.data?.message || "Something went wrong"
-      );
+      console.log(error, "error");
+      Alert.alert("Login failed", error.response?.data?.message);
     },
   });
 
@@ -102,7 +93,7 @@ const login = () => {
     }),
     ...{ useProxy: true },
   });
-  console.log("hello");
+
   useEffect(() => {
     if (response?.type === "success" && response.authentication?.accessToken) {
       fetchUserInfo(response.authentication.accessToken);

@@ -1,10 +1,4 @@
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from "react-native";
+import { useColorScheme } from "react-native";
 import React from "react";
 import { Slot, Stack } from "expo-router";
 
@@ -26,7 +20,7 @@ const AuthLayout = () => {
         }}
       >
         <Stack.Screen name="login" options={{ headerShown: false }} />
-        <Stack.Screen name="Signup" />
+        <Stack.Screen name="signup" />
       </Stack>
     </>
   );

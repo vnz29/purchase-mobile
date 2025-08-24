@@ -1,17 +1,14 @@
 // app/_layout.tsx
 import {
   ActivityIndicator,
-  Pressable,
   StyleSheet,
   useColorScheme,
   View,
-  Text,
-  TouchableOpacity,
 } from "react-native";
-import React, { use, useEffect, useState } from "react";
-import { Stack, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Stack } from "expo-router";
 import { Colors } from "../constant/Colors";
-import { Ionicons } from "@expo/vector-icons";
+
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

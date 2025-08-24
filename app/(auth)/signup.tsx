@@ -1,10 +1,4 @@
-import {
-  ActivityIndicator,
-  Button,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import ThemedTextInput from "../../components/ThemedTextInput";
 import ThemedButton from "../../components/ThemedButton";
@@ -13,7 +7,6 @@ import { useMutation } from "@tanstack/react-query";
 import api from "../../lib/axios";
 import Toast from "react-native-toast-message";
 import ThemedSafeArea from "../../components/ThemedSafeArea";
-import ThemedView from "../../components/ThemedView";
 import { router } from "expo-router";
 
 const signup = () => {

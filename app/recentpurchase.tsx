@@ -1,15 +1,6 @@
-import {
-  Alert,
-  Button,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import React, { useRef, useState } from "react";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import React from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
 
 import ThemedList from "../components/ThemedList";
 import CustomBottomSheet from "../components/CustomBottomSheet";
@@ -20,19 +11,14 @@ import { useUpdatePurchase } from "../hooks/useUpdatePurchase";
 import { useDeletePurchase } from "../hooks/useDeletePurchase";
 
 import {
-  FormDataProps,
   PurchaseFormData,
   PurchaseResponseHttp,
   PurchaseSchema,
   TPurchase,
-  UpdateFormDataProps,
 } from "../types";
 
-import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { AxiosError } from "axios";
-import { MaterialIcons } from "@expo/vector-icons";
 
 const RecentPurchase = () => {
   const queryClient = useQueryClient();

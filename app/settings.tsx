@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { useAuthStore } from "../store/useAuthStore";
 import { useMutation } from "@tanstack/react-query";
 import { logOutUser } from "../api/auth";
-import { queryClient } from "../lib/queryClient";
+
 const settings = () => {
   const router = useRouter();
   const { user, accessToken, logout, isLoggedIn } = useAuthStore();
