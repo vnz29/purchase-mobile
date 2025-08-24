@@ -112,4 +112,5 @@ export type CustomBottomSheetPropss = {
 
   handleSubmit: UseFormHandleSubmit<PurchaseFormData>;
   onSubmit: (data: PurchaseFormData) => void;
+  buttonText: string;
 };

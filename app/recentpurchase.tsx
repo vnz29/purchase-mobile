@@ -142,6 +142,7 @@ const RecentPurchase = () => {
         reset={reset}
         handleSubmit={handleSubmit}
         onSubmit={onSubmit}
+        buttonText="Update"
       />
     </View>
   );

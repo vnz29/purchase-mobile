@@ -232,6 +232,7 @@ const Index = () => {
         reset={reset}
         handleSubmit={handleSubmit}
         onSubmit={onSubmit}
+        buttonText="Add"
       />
     </ThemedHomeView>
   );

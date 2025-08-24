@@ -27,6 +27,7 @@ const CustomBottomSheet = forwardRef<Ref, CustomBottomSheetPropss>(
       handleSubmit,
       errors,
       reset,
+      buttonText,
     },
     ref
   ) => {
@@ -118,7 +119,7 @@ const CustomBottomSheet = forwardRef<Ref, CustomBottomSheetPropss>(
                 onPress={handleSubmit(onSubmit)}
               >
                 <ThemedText style={styles.fabText}>
-                  {isLoading ? "Loading" : "Add"}
+                  {isLoading ? "Loading" : buttonText}
                 </ThemedText>
               </ThemedButton>
             </View>
